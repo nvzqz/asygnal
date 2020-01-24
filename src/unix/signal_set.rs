@@ -46,7 +46,7 @@ cfg_futures! {
         #[inline]
         fn poll_next(
             mut self: std::pin::Pin<&mut Self>,
-            cx: &mut Context<'_>
+            cx: &mut Context<'_>,
         ) -> Poll<Option<SignalKind>> {
             self.poll_recv(cx)
         }
