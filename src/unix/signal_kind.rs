@@ -20,6 +20,7 @@ const SIGINFO: c_int = libc::SIGINFO;
     target_os = "emscripten",
     target_os = "linux",
 ))]
+#[allow(unused)]
 const SIGINFO: c_int = -1;
 
 impl SignalKind {
