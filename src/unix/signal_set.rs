@@ -48,6 +48,13 @@ impl Extend<SignalKind> for SignalSetBuilder {
     }
 }
 
+impl Default for SignalSetBuilder {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SignalSetBuilder {
     /// Creates a new, empty signal set builder.
     #[inline]
