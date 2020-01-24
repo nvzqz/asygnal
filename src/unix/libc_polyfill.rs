@@ -1,9 +1,9 @@
-#![allow(non_camel_case_types, private_in_public)]
+#![allow(non_camel_case_types)]
 
 // This module exists to enable docs.rs to show Unix when compiling for Windows.
 
 #[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
-struct Opaque;
+pub struct Opaque;
 
 pub type sigset_t = Opaque;
 pub type c_int = i32;
