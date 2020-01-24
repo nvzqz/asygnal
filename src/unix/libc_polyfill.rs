@@ -8,10 +8,10 @@ pub struct Opaque;
 pub type sigset_t = Opaque;
 pub type c_int = i32;
 
-pub fn sigemptyset(_: *mut sigset_t) -> c_int {
+pub unsafe fn sigemptyset(_: *mut sigset_t) -> c_int {
     -1
 }
-pub fn sigaddset(_: *mut sigset_t, _: c_int) {}
+pub unsafe fn sigaddset(_: *mut sigset_t, _: c_int) {}
 
 pub const SIGALRM: c_int = -1;
 pub const SIGCHLD: c_int = -1;
