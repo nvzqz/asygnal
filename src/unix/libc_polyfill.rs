@@ -1,4 +1,4 @@
-#![allow(unused, non_camel_case_types, private_in_public)]
+#![allow(non_camel_case_types, private_in_public)]
 
 // This module exists to enable docs.rs to show Unix when compiling for Windows.
 
