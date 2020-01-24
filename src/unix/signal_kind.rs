@@ -1,7 +1,6 @@
 // Required to enable polyfills on non-Unix platforms when documenting.
-mod libc {
-    pub use super::super::libc::*;
-}
+#[cfg(not(unix))]
+use super::libc_polyfill as libc;
 
 /// A specific kind of signal.
 ///

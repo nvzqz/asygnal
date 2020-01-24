@@ -6,14 +6,8 @@ mod signal_kind;
 mod signal_set;
 
 // Required when documenting on non-Unix platforms.
-#[path = "libc_polyfill.rs"]
 #[cfg(not(unix))]
-mod libc;
-
-#[cfg(unix)]
-mod libc {
-    pub use libc::*;
-}
+mod libc_polyfill;
 
 #[doc(inline)]
 pub use self::{signal_kind::*, signal_set::*};
