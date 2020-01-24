@@ -6,6 +6,14 @@ use libc::c_int;
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SignalKind(c_int);
 
+// Needed in case `libc::SIGINFO` is not defined on the current platform and
+// thus prevents the docs from compiling.
+#[cfg(not(feature = "_docs"))]
+const SIGINFO: c_int = libc::SIGINFO;
+
+#[cfg(feature = "_docs")]
+const SIGINFO: c_int = -1;
+
 impl SignalKind {
     // Constants are used so then they can be `match`ed on.
 
@@ -34,11 +42,14 @@ impl SignalKind {
     /// **Keyboard shortcut:** `CTRL` + `T`.
     ///
     /// **Default behavior:** ignored.
-    #[cfg(not(any(
-        target_os = "android",
-        target_os = "emscripten",
-        target_os = "linux",
-    )))]
+    #[cfg(any(
+        not(any(
+            target_os = "android",
+            target_os = "emscripten",
+            target_os = "linux",
+        )),
+        feature = "_docs",
+    ))]
     // This doesn't seem to change docs to list the supported target OSes.
     #[cfg_attr(
         feature = "_docs",
@@ -48,7 +59,7 @@ impl SignalKind {
             target_os = "linux",
         )))
     )]
-    pub const INFO: Self = Self(libc::SIGINFO);
+    pub const INFO: Self = Self(SIGINFO);
 
     /// The `SIGINT` signal; sent to interrupt a program.
     ///

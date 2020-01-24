@@ -137,11 +137,14 @@ impl SignalSetBuilder {
     /// **Keyboard shortcut:** `CTRL` + `T`.
     ///
     /// **Default behavior:** ignored.
-    #[cfg(not(any(
-        target_os = "android",
-        target_os = "emscripten",
-        target_os = "linux",
-    )))]
+    #[cfg(any(
+        not(any(
+            target_os = "android",
+            target_os = "emscripten",
+            target_os = "linux",
+        )),
+        feature = "_docs",
+    ))]
     // This doesn't seem to change docs to list the supported target OSes.
     #[cfg_attr(
         feature = "_docs",
