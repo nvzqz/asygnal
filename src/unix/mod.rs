@@ -5,6 +5,16 @@ use std::task::{Context, Poll};
 mod signal_kind;
 mod signal_set;
 
+// Required when documenting on non-Unix platforms.
+#[path = "libc_polyfill.rs"]
+#[cfg(not(unix))]
+mod libc;
+
+#[cfg(unix)]
+mod libc {
+    pub use libc::*;
+}
+
 #[doc(inline)]
 pub use self::{signal_kind::*, signal_set::*};
 

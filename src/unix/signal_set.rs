@@ -1,4 +1,3 @@
-use libc::sigset_t;
 use std::{
     iter::FromIterator,
     mem::MaybeUninit,
@@ -6,6 +5,11 @@ use std::{
 };
 
 use super::SignalKind;
+
+// Required to enable polyfills on non-Unix platforms when documenting.
+mod libc {
+    pub use super::super::libc::*;
+}
 
 /// A stream for receiving a set of signals.
 #[derive(Debug)]
@@ -57,7 +61,7 @@ cfg_stream! {
 /// [`SignalSet`]: struct.SignalSet.html
 #[derive(Clone, Copy)]
 pub struct SignalSetBuilder {
-    signal_set: sigset_t,
+    signal_set: libc::sigset_t,
 }
 
 impl FromIterator<SignalKind> for SignalSetBuilder {
@@ -94,7 +98,7 @@ impl SignalSetBuilder {
     #[must_use]
     pub fn new() -> Self {
         unsafe {
-            let mut set = MaybeUninit::<sigset_t>::uninit();
+            let mut set = MaybeUninit::<libc::sigset_t>::uninit();
             libc::sigemptyset(set.as_mut_ptr());
             Self::from_raw(set.assume_init())
         }
@@ -108,14 +112,14 @@ impl SignalSetBuilder {
     /// unsupported signal set invalidates this assumption.
     #[inline]
     #[must_use]
-    pub const unsafe fn from_raw(signal_set: sigset_t) -> Self {
+    pub const unsafe fn from_raw(signal_set: libc::sigset_t) -> Self {
         Self { signal_set }
     }
 
     /// Returns the raw value of this signal set builder.
     #[inline]
     #[must_use]
-    pub const fn into_raw(self) -> sigset_t {
+    pub const fn into_raw(self) -> libc::sigset_t {
         self.signal_set
     }
 

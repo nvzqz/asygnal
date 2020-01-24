@@ -19,10 +19,10 @@ _docs = [] # Used for showing all target-specific items in docs.rs
 [dependencies]
 futures = { version = "0.3.1", optional = true }
 
-[target.'cfg(any(unix, docsrs))'.dependencies]
+[target.'cfg(unix)'.dependencies]
 libc = "0.2.66"
 
-[target.'cfg(any(windows, docsrs))'.dependencies]
+[target.'cfg(windows)'.dependencies]
 winapi = "0.3.8"
 
 [package.metadata.docs.rs]
