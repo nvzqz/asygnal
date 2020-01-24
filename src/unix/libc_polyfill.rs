@@ -2,6 +2,7 @@
 
 // This module exists to enable docs.rs to show Unix when compiling for Windows.
 
+#[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct Opaque;
 
 pub type sigset_t = Opaque;
