@@ -1,10 +1,13 @@
-use libc::c_int;
+// Required to enable polyfills on non-Unix platforms when documenting.
+mod libc {
+    pub use super::super::libc::*;
+}
 
 /// A specific kind of signal.
 ///
 /// Signals that cannot be handled are not listed as constants.
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct SignalKind(c_int);
+pub struct SignalKind(libc::c_int);
 
 // Needed in case `libc::SIGINFO` is not defined on the current platform and
 // thus prevents the docs from compiling.
@@ -13,7 +16,7 @@ pub struct SignalKind(c_int);
     target_os = "emscripten",
     target_os = "linux",
 )))]
-const SIGINFO: c_int = libc::SIGINFO;
+const SIGINFO: libc::c_int = libc::SIGINFO;
 
 #[cfg(any(
     target_os = "android",
@@ -21,7 +24,7 @@ const SIGINFO: c_int = libc::SIGINFO;
     target_os = "linux",
 ))]
 #[allow(unused)]
-const SIGINFO: c_int = -1;
+const SIGINFO: libc::c_int = -1;
 
 impl SignalKind {
     // Constants are used so then they can be `match`ed on.
@@ -124,13 +127,13 @@ impl SignalKind {
     /// This library assumes that all signals used are valid. Supplying an
     /// unsupported signal number invalidates this assumption.
     #[inline]
-    pub const unsafe fn from_raw(signal: c_int) -> Self {
+    pub const unsafe fn from_raw(signal: libc::c_int) -> Self {
         Self(signal)
     }
 
     /// Returns the raw value of this signal.
     #[inline]
-    pub const fn into_raw(self) -> c_int {
+    pub const fn into_raw(self) -> libc::c_int {
         self.0
     }
 }
