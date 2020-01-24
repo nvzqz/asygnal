@@ -1,0 +1,26 @@
+[package]
+name = "asygnal"
+version = "0.0.0"
+authors = ["Nikolai Vazquez"]
+license = "MIT OR Apache-2.0"
+edition = "2018"
+homepage = "https://github.com/nvzqz/asygnal"
+repository = "https://github.com/nvzqz/asygnal"
+documentation = "https://docs.rs/asygnal"
+description = "[WIP] Async-first signal handling, such as ctrl-c."
+keywords = ["async", "signal", "sigint", "ctrlc"]
+categories = ["asynchronous", "concurrency"]
+include = ["Cargo.toml", "src", "README*", "CHANGELOG*", "LICENSE*"]
+
+[features]
+_docs = [] # Used for showing all target-specific items in docs.rs
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.66"
+
+[target.'cfg(windows)'.dependencies]
+winapi = "0.3.8"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "feature=\"_docs\""]
