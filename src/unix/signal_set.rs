@@ -22,7 +22,7 @@ impl SignalSet {
 /// Signals that cannot be handled are not listed as methods.
 ///
 /// [`SignalSet`]: struct.SignalSet.html
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy)]
 pub struct SignalSetBuilder {
     signal_set: sigset_t,
 }
