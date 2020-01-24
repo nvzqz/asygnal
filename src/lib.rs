@@ -5,3 +5,19 @@
 
 #![deny(missing_docs)]
 #![cfg_attr(feature = "_docs", feature(doc_cfg))]
+
+#[macro_use]
+mod macros;
+
+cfg_unix! {
+    pub mod unix;
+}
+
+#[cfg(windows)]
+mod windows;
+
+/// A future for `CTRL` + `C` signals.
+#[derive(Debug)]
+pub struct CtrlC {
+    _private: (),
+}
