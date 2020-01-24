@@ -8,10 +8,18 @@ pub struct SignalKind(c_int);
 
 // Needed in case `libc::SIGINFO` is not defined on the current platform and
 // thus prevents the docs from compiling.
-#[cfg(not(feature = "_docs"))]
+#[cfg(not(any(
+    target_os = "android",
+    target_os = "emscripten",
+    target_os = "linux",
+)))]
 const SIGINFO: c_int = libc::SIGINFO;
 
-#[cfg(feature = "_docs")]
+#[cfg(any(
+    target_os = "android",
+    target_os = "emscripten",
+    target_os = "linux",
+))]
 const SIGINFO: c_int = -1;
 
 impl SignalKind {
