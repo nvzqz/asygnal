@@ -13,7 +13,6 @@ categories = ["asynchronous", "concurrency"]
 include = ["Cargo.toml", "src", "README*", "CHANGELOG*", "LICENSE*"]
 
 [features]
-stream = ["futures"]
 _docs = [] # Used for showing all target-specific items in docs.rs
 
 [dependencies]

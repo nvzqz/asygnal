@@ -35,7 +35,7 @@ impl Signal {
     }
 }
 
-cfg_stream! {
+cfg_futures! {
     impl futures::stream::Stream for Signal {
         type Item = SignalKind;
 

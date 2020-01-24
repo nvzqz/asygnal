@@ -40,7 +40,7 @@ impl CtrlC {
     }
 }
 
-cfg_stream! {
+cfg_futures! {
     impl futures::stream::Stream for CtrlC {
         type Item = ();
 

@@ -1,8 +1,8 @@
-macro_rules! cfg_stream {
+macro_rules! cfg_futures {
     ($($item:item)*) => {
         $(
-            #[cfg(feature = "stream")]
-            #[cfg_attr(docsrs, doc(cfg(feature = "stream")))]
+            #[cfg(feature = "futures")]
+            #[cfg_attr(docsrs, doc(cfg(feature = "futures")))]
             $item
         )*
     }
