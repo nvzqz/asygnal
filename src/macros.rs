@@ -1,3 +1,13 @@
+macro_rules! cfg_stream {
+    ($($item:item)*) => {
+        $(
+            #[cfg(feature = "stream")]
+            #[cfg_attr(feature = "_docs", doc(cfg(feature = "stream")))]
+            $item
+        )*
+    }
+}
+
 macro_rules! cfg_unix {
     ($($item:item)*) => {
         $(
