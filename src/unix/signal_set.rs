@@ -176,11 +176,11 @@ impl SignalSetBuilder {
             target_os = "emscripten",
             target_os = "linux",
         )),
-        feature = "_docs",
+        docsrs,
     ))]
     // This doesn't seem to change docs to list the supported target OSes.
     #[cfg_attr(
-        feature = "_docs",
+        docsrs,
         doc(not(any(
             target_os = "android",
             target_os = "emscripten",

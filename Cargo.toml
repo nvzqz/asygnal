@@ -27,4 +27,4 @@ winapi = "0.3.8"
 
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "feature=\"_docs\""]
+rustdoc-args = ["--cfg", "docsrs"]
