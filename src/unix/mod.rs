@@ -1,5 +1,7 @@
 //! Unix-specific functionality.
 
+#![cfg_attr(not(unix), allow(warnings))]
+
 use std::task::{Context, Poll};
 
 mod signal_kind;
