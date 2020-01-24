@@ -4,7 +4,7 @@
 //! an alternative approach that awaits a blocking signal handler.
 
 #![deny(missing_docs)]
-#![cfg_attr(feature = "_docs", feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 use std::task::{Context, Poll};
 
