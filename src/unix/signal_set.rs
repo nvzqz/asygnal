@@ -132,28 +132,24 @@ impl SignalSetBuilder {
 
     /// The `SIGINFO` signal; sent to request a status update from the process.
     ///
-    /// **Supported on:** `dragonfly`, `freebsd`, `macos`, `netbsd`, `openbsd`.
+    /// **Not supported on:** `android`, `emscripten`, `linux`.
     ///
     /// **Keyboard shortcut:** `CTRL` + `T`.
     ///
     /// **Default behavior:** ignored.
-    #[cfg(any(
-        target_os = "dragonfly",
-        target_os = "freebsd",
-        target_os = "macos",
-        target_os = "netbsd",
-        target_os = "openbsd"
-    ))]
+    #[cfg(not(any(
+        target_os = "android",
+        target_os = "emscripten",
+        target_os = "linux",
+    )))]
     // This doesn't seem to change docs to list the supported target OSes.
     #[cfg_attr(
         feature = "_docs",
-        doc(any(
-            target_os = "dragonfly",
-            target_os = "freebsd",
-            target_os = "macos",
-            target_os = "netbsd",
-            target_os = "openbsd"
-        ))
+        doc(not(any(
+            target_os = "android",
+            target_os = "emscripten",
+            target_os = "linux",
+        )))
     )]
     #[inline]
     #[must_use]
