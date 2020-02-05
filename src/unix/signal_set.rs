@@ -77,19 +77,76 @@ impl SignalSet {
 
     /// Creates a new set of signals that result in process termination.
     ///
-    /// The included signals are only those that can be gracefully handled.
+    /// This only includes signals that can be trivially handled with grace:
+    /// - [`alarm`](#method.alarm)
+    /// - [`hangup`](#method.hangup)
+    /// - [`interrupt`](#method.interrupt)
+    /// - [`pipe`](#method.pipe)
+    /// - [`quit`](#method.quit)
+    /// - [`terminate`](#method.terminate)
+    /// - [`user_defined_1`](#method.user_defined_1)
+    /// - [`user_defined_2`](#method.user_defined_2)
+    ///
+    /// If a listed signal is not available for the current target, the returned
+    /// set will simply not include it.
     #[inline]
     #[must_use]
     pub const fn termination() -> Self {
-        Self::new()
-            .alarm()
-            .hangup()
-            .interrupt()
-            .pipe()
-            .quit()
-            .terminate()
-            .user_defined_1()
-            .user_defined_2()
+        #[allow(unused_mut)]
+        let mut set = Self::new();
+
+        // This would make for an amazing use case of `#[cfg(accessible(...))]`.
+        // See https://github.com/rust-lang/rust/issues/64797 for info on this.
+        #[cfg(any(
+            // According to `libc`:
+            // "bsd"
+            target_os = "macos",
+            target_os = "ios",
+            target_os = "freebsd",
+            target_os = "dragonfly",
+            target_os = "openbsd",
+            target_os = "netbsd",
+            // "linux-like"
+            target_os = "linux",
+            target_os = "android",
+            target_os = "emscripten",
+            // "solarish"
+            target_os = "solaris",
+            target_os = "illumos",
+            // Uncategorized
+            windows,
+            target_os = "fuchsia",
+            target_os = "redox",
+            target_os = "haiku",
+            target_os = "hermit",
+            target_os = "vxworks",
+            target_env = "uclibc",
+        ))]
+        {
+            #[cfg(not(windows))]
+            {
+                set = set.alarm().hangup().pipe().quit();
+            }
+
+            #[cfg(any(
+                not(target_env = "uclibc"),
+                all(
+                    target_env = "uclibc",
+                    any(
+                        target_arch = "arm",
+                        target_arch = "mips",
+                        target_arch = "mips64",
+                    ),
+                ),
+            ))]
+            {
+                set = set.user_defined_1().user_defined_2();
+            }
+
+            set = set.interrupt().terminate();
+        }
+
+        set
     }
 
     /// Converts `self` into a raw signal set.
