@@ -64,9 +64,7 @@ impl CtrlCOnce {
     #[inline]
     pub fn register_termination() -> Result<Self, RegisterCtrlCOnceError> {
         #[cfg(unix)]
-        let inner = crate::unix::SignalSet::new()
-            .termination_set()
-            .register_once()?;
+        let inner = crate::unix::SignalSet::termination().register_once()?;
 
         Ok(Self(inner))
     }

@@ -75,6 +75,23 @@ impl SignalSet {
         Self(SignalMask::full())
     }
 
+    /// Creates a new set of signals that result in process termination.
+    ///
+    /// The included signals are only those that can be gracefully handled.
+    #[inline]
+    #[must_use]
+    pub const fn termination() -> Self {
+        Self::new()
+            .alarm()
+            .hangup()
+            .interrupt()
+            .pipe()
+            .quit()
+            .terminate()
+            .user_defined_1()
+            .user_defined_2()
+    }
+
     /// Converts `self` into a raw signal set.
     pub fn into_raw(self) -> libc::sigset_t {
         let mut set = unsafe {
@@ -100,22 +117,6 @@ impl SignalSet {
         crate::once::unix::RegisterOnceError,
     > {
         crate::once::unix::SignalSetOnce::register(self)
-    }
-
-    /// The set of signals that result in process termination.
-    ///
-    /// The included signals are only those that can be gracefully handled.
-    #[inline]
-    #[must_use]
-    pub const fn termination_set(self) -> Self {
-        self.alarm()
-            .hangup()
-            .interrupt()
-            .pipe()
-            .quit()
-            .terminate()
-            .user_defined_1()
-            .user_defined_2()
     }
 
     /// Returns `self` with `signal` added to it.
