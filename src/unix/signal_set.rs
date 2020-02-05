@@ -103,6 +103,8 @@ impl SignalSet {
     }
 
     /// The set of signals that result in process termination.
+    ///
+    /// The included signals are only those that can be gracefully handled.
     #[inline]
     #[must_use]
     pub const fn termination_set(self) -> Self {
