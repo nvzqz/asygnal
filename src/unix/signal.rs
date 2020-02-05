@@ -1,3 +1,4 @@
+use super::SignalSet;
 use std::mem;
 
 // Required to enable polyfills on non-Unix platforms when documenting.
@@ -10,7 +11,7 @@ macro_rules! signals {
     ($(
         $(#[doc = $doc:literal])+
         $(#[cfg($cfg:meta)])?
-        $name:ident, $libc:ident;
+        $variant:ident, $method:ident, $libc:ident;
     )+) => {
         /// Signals supported by this library.
         ///
@@ -27,7 +28,7 @@ macro_rules! signals {
                     #[cfg(any(docsrs, $cfg))]
                     #[cfg_attr(docsrs, doc(cfg($cfg)))]
                 )?
-                $name,
+                $variant,
             )+
         }
 
@@ -38,7 +39,7 @@ macro_rules! signals {
                 match signal {
                     $(
                         $(#[cfg($cfg)])?
-                        libc::$libc => Some(Self::$name),
+                        libc::$libc => Some(Self::$variant),
                     )+
                     _ => None,
                 }
@@ -53,10 +54,25 @@ macro_rules! signals {
                 match self {
                     $(
                         $(#[cfg($cfg)])?
-                        Self::$name => libc::$libc,
+                        Self::$variant => libc::$libc,
                     )+
                 }
             }
+        }
+
+        impl SignalSet {
+            $(
+                $(#[doc = $doc])+
+                $(
+                    #[cfg(any(docsrs, $cfg))]
+                    #[cfg_attr(docsrs, doc(cfg($cfg)))]
+                )?
+                #[must_use]
+                #[inline]
+                pub const fn $method(self) -> Self {
+                    self.with(Signal::$variant)
+                }
+            )+
         }
     };
 }
@@ -65,17 +81,17 @@ signals! {
     /// The `SIGALRM` signal; sent when a real-time timer expires.
     ///
     /// **Default behavior:** process termination.
-    Alarm, SIGALRM;
+    Alarm, alarm, SIGALRM;
 
     /// The `SIGCHLD` signal; sent when the status of a child process changes.
     ///
     /// **Default behavior:** ignored.
-    Child, SIGCHLD;
+    Child, child, SIGCHLD;
 
     /// The `SIGHUP` signal; sent when the terminal is disconnected.
     ///
     /// **Default behavior:** process termination.
-    Hangup, SIGHUP;
+    Hangup, hangup, SIGHUP;
 
     /// The `SIGINFO` signal; sent to request a status update from the process.
     ///
@@ -95,26 +111,26 @@ signals! {
         target_os = "solaris",
         target_os = "illumos",
     ))]
-    Info, SIGINFO;
+    Info, info, SIGINFO;
 
     /// The `SIGINT` signal; sent to interrupt a program.
     ///
     /// **Keyboard shortcut:** `CTRL` + `C`.
     ///
     /// **Default behavior:** process termination.
-    Interrupt, SIGINT;
+    Interrupt, interrupt, SIGINT;
 
     /// The `SIGIO` signal; sent when I/O operations are possible on some file
     /// descriptor.
     ///
     /// **Default behavior:** ignored.
-    Io, SIGIO;
+    Io, io, SIGIO;
 
     /// The `SIGPIPE` signal; sent when the process attempts to write to a pipe
     /// which has no reader.
     ///
     /// **Default behavior:** process termination.
-    Pipe, SIGPIPE;
+    Pipe, pipe, SIGPIPE;
 
     /// The `SIGQUIT` signal; sent to issue a shutdown of the process, after
     /// which the OS will dump the process core.
@@ -122,27 +138,27 @@ signals! {
     /// **Keyboard shortcut:** `CTRL` + `\`.
     ///
     /// **Default behavior:** process termination.
-    Quit, SIGQUIT;
+    Quit, quit, SIGQUIT;
 
     /// The `SIGTERM` signal; sent to issue a shutdown of the process.
     ///
     /// **Default behavior:** process termination.
-    Terminate, SIGTERM;
+    Terminate, terminate, SIGTERM;
 
     /// The `SIGUSR1` signal; a user defined signal.
     ///
     /// **Default behavior:** process termination.
-    UserDefined1, SIGUSR1;
+    UserDefined1, user_defined_1, SIGUSR1;
 
     /// The `SIGUSR2` signal; a user defined signal.
     ///
     /// **Default behavior:** process termination.
-    UserDefined2, SIGUSR2;
+    UserDefined2, user_defined_2, SIGUSR2;
 
     /// The `SIGWINCH` signal; sent when the terminal window is resized.
     ///
     /// **Default behavior:** ignored.
-    WindowChange, SIGWINCH;
+    WindowChange, window_change, SIGWINCH;
 }
 
 impl Signal {
