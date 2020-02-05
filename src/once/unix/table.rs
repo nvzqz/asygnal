@@ -32,6 +32,7 @@ pub(crate) struct Entry {
 }
 
 impl Entry {
+    #[allow(clippy::declare_interior_mutable_const)]
     const EMPTY: Self = Self {
         writer: AtomicI32::new(0),
     };
