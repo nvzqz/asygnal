@@ -1,131 +1,104 @@
-use std::{
-    iter::FromIterator,
-    mem::MaybeUninit,
-    task::{Context, Poll},
-};
+use std::{fmt, iter::FromIterator, mem::MaybeUninit};
 
-use super::SignalKind;
+use super::{signal_mask::SignalMask, Signal};
 
-// Required to enable polyfills on non-Unix platforms when documenting.
-#[cfg(not(unix))]
-use super::libc_polyfill as libc;
-
-/// A stream for receiving a set of signals.
-#[derive(Debug)]
-pub struct SignalSet {
-    _private: (),
-}
-
-impl SignalSet {
-    /// Returns a builder for constructing an instance.
-    #[inline]
-    pub fn builder() -> SignalSetBuilder {
-        SignalSetBuilder::new()
-    }
-
-    /// Receive the next signal notification event.
-    #[inline]
-    pub async fn recv(&mut self) -> Option<SignalKind> {
-        crate::util::poll_fn(|cx| self.poll_recv(cx)).await
-    }
-
-    /// Poll to receive the next signal notification event, outside of an
-    /// `async` context.
-    pub fn poll_recv(
-        &mut self,
-        _cx: &mut Context<'_>,
-    ) -> Poll<Option<SignalKind>> {
-        unimplemented!()
-    }
-}
-
-cfg_futures! {
-    impl futures::stream::Stream for SignalSet {
-        type Item = SignalKind;
-
-        #[inline]
-        fn poll_next(
-            mut self: std::pin::Pin<&mut Self>,
-            cx: &mut Context<'_>,
-        ) -> Poll<Option<SignalKind>> {
-            self.poll_recv(cx)
-        }
-    }
-}
-
-/// Constructs a [`SignalSet`] using the builder pattern.
+/// A set of signals supported by this library.
 ///
 /// Signals that cannot be handled are not listed as methods.
-///
-/// [`SignalSet`]: struct.SignalSet.html
-#[derive(Clone, Copy)]
-pub struct SignalSetBuilder {
-    signal_set: libc::sigset_t,
+#[derive(Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(transparent)]
+pub struct SignalSet(pub(crate) SignalMask);
+
+impl From<Signal> for SignalSet {
+    #[inline]
+    fn from(signal: Signal) -> Self {
+        Self(signal.into())
+    }
 }
 
-impl FromIterator<SignalKind> for SignalSetBuilder {
+impl fmt::Debug for SignalSet {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_set().entries(self.into_iter()).finish()
+    }
+}
+
+impl IntoIterator for SignalSet {
+    type Item = Signal;
+    type IntoIter = SignalSetIter;
+
+    #[inline]
+    fn into_iter(self) -> SignalSetIter {
+        SignalSetIter(self)
+    }
+}
+
+impl FromIterator<Signal> for SignalSet {
     #[inline]
     fn from_iter<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = SignalKind>,
+        I: IntoIterator<Item = Signal>,
     {
         iter.into_iter()
             .fold(Self::new(), |builder, signal| builder.with(signal))
     }
 }
 
-impl Extend<SignalKind> for SignalSetBuilder {
+impl Extend<Signal> for SignalSet {
     #[inline]
     fn extend<I>(&mut self, iter: I)
     where
-        I: IntoIterator<Item = SignalKind>,
+        I: IntoIterator<Item = Signal>,
     {
         iter.into_iter().for_each(|signal| self.insert(signal));
     }
 }
 
-impl Default for SignalSetBuilder {
+impl Default for SignalSet {
     #[inline]
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl SignalSetBuilder {
+impl SignalSet {
     /// Creates a new, empty signal set builder.
     #[inline]
     #[must_use]
-    pub fn new() -> Self {
-        unsafe {
+    pub const fn new() -> Self {
+        Self(SignalMask::empty())
+    }
+
+    /// Converts `self` into a raw signal set.
+    pub fn into_raw(self) -> libc::sigset_t {
+        let mut set = unsafe {
             let mut set = MaybeUninit::<libc::sigset_t>::uninit();
             libc::sigemptyset(set.as_mut_ptr());
-            Self::from_raw(set.assume_init())
+            set.assume_init()
+        };
+        for signal in self {
+            unsafe { libc::sigaddset(&mut set, signal.into_raw()) };
         }
+        set
     }
 
-    /// Creates a new builder from the raw `signal_set`.
+    /// Registers a signal handler that will only be fulfilled once.
     ///
-    /// # Safety
-    ///
-    /// This library assumes that all signals used are valid. Supplying an
-    /// unsupported signal set invalidates this assumption.
-    #[inline]
-    #[must_use]
-    pub const unsafe fn from_raw(signal_set: libc::sigset_t) -> Self {
-        Self { signal_set }
-    }
-
-    /// Returns the raw value of this signal set builder.
-    #[inline]
-    #[must_use]
-    pub const fn into_raw(self) -> libc::sigset_t {
-        self.signal_set
+    /// After the `SignalSetOnce` is fulfilled, all subsequent polls will return
+    /// `Ready`.
+    #[cfg(feature = "once")]
+    pub fn register_once(
+        self,
+    ) -> Result<
+        crate::once::unix::SignalSetOnce,
+        crate::once::unix::RegisterOnceError,
+    > {
+        crate::once::unix::SignalSetOnce::register(self)
     }
 
     /// The set of signals that result in process termination.
     #[inline]
     #[must_use]
-    pub fn termination_set(self) -> Self {
+    pub const fn termination_set(self) -> Self {
         self.alarm()
             .hangup()
             .interrupt()
@@ -137,15 +110,15 @@ impl SignalSetBuilder {
     }
 
     // REMINDER: When updating the documentation of the following methods, their
-    // corresponding `SignalKind` constants must be updated as well.
+    // corresponding `Signal` variants must be updated as well.
 
     /// The `SIGALRM` signal; sent when a real-time timer expires.
     ///
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn alarm(self) -> Self {
-        self.with(SignalKind::ALARM)
+    pub const fn alarm(self) -> Self {
+        self.with(Signal::Alarm)
     }
 
     /// The `SIGCHLD` signal; sent when the status of a child process changes.
@@ -153,8 +126,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** ignored.
     #[inline]
     #[must_use]
-    pub fn child(self) -> Self {
-        self.with(SignalKind::CHILD)
+    pub const fn child(self) -> Self {
+        self.with(Signal::Child)
     }
 
     /// The `SIGHUP` signal; sent when the terminal is disconnected.
@@ -162,8 +135,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn hangup(self) -> Self {
-        self.with(SignalKind::HANGUP)
+    pub const fn hangup(self) -> Self {
+        self.with(Signal::Hangup)
     }
 
     /// The `SIGINFO` signal; sent to request a status update from the process.
@@ -192,8 +165,8 @@ impl SignalSetBuilder {
     )]
     #[inline]
     #[must_use]
-    pub fn info(self) -> Self {
-        self.with(SignalKind::INFO)
+    pub const fn info(self) -> Self {
+        self.with(Signal::Info)
     }
 
     /// The `SIGINT` signal; sent to interrupt a program.
@@ -203,8 +176,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn interrupt(self) -> Self {
-        self.with(SignalKind::INTERRUPT)
+    pub const fn interrupt(self) -> Self {
+        self.with(Signal::Interrupt)
     }
 
     /// The `SIGIO` signal; sent when I/O operations are possible on some file
@@ -213,8 +186,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** ignored.
     #[inline]
     #[must_use]
-    pub fn io(self) -> Self {
-        self.with(SignalKind::IO)
+    pub const fn io(self) -> Self {
+        self.with(Signal::Io)
     }
 
     /// The `SIGPIPE` signal; sent when the process attempts to write to a pipe
@@ -223,8 +196,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn pipe(self) -> Self {
-        self.with(SignalKind::PIPE)
+    pub const fn pipe(self) -> Self {
+        self.with(Signal::Pipe)
     }
 
     /// The `SIGQUIT` signal; sent to issue a shutdown of the process, after
@@ -235,8 +208,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn quit(self) -> Self {
-        self.with(SignalKind::QUIT)
+    pub const fn quit(self) -> Self {
+        self.with(Signal::Quit)
     }
 
     /// The `SIGTERM` signal; sent to issue a shutdown of the process.
@@ -244,8 +217,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn terminate(self) -> Self {
-        self.with(SignalKind::TERMINATE)
+    pub const fn terminate(self) -> Self {
+        self.with(Signal::Terminate)
     }
 
     /// The `SIGUSR1` signal; a user defined signal.
@@ -253,8 +226,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn user_defined_1(self) -> Self {
-        self.with(SignalKind::USER_DEFINED_1)
+    pub const fn user_defined_1(self) -> Self {
+        self.with(Signal::UserDefined1)
     }
 
     /// The `SIGUSR2` signal; a user defined signal.
@@ -262,8 +235,8 @@ impl SignalSetBuilder {
     /// **Default behavior:** process termination.
     #[inline]
     #[must_use]
-    pub fn user_defined_2(self) -> Self {
-        self.with(SignalKind::USER_DEFINED_2)
+    pub const fn user_defined_2(self) -> Self {
+        self.with(Signal::UserDefined2)
     }
 
     /// The `SIGWINCH` signal; sent when the terminal window is resized.
@@ -271,23 +244,102 @@ impl SignalSetBuilder {
     /// **Default behavior:** ignored.
     #[inline]
     #[must_use]
-    pub fn window_change(self) -> Self {
-        self.with(SignalKind::WINDOW_CHANGE)
+    pub const fn window_change(self) -> Self {
+        self.with(Signal::WindowChange)
     }
 
     /// Returns `self` with `signal` added to it.
     #[inline]
     #[must_use]
-    pub fn with(mut self, signal: SignalKind) -> Self {
-        self.insert(signal);
-        self
+    pub const fn with(self, signal: Signal) -> Self {
+        Self(self.0.with(signal, true))
     }
 
-    /// Adds `signal` to `self`.
+    /// Returns `self` without `signal`.
     #[inline]
-    pub fn insert(&mut self, signal: SignalKind) {
-        unsafe {
-            libc::sigaddset(&mut self.signal_set, signal.into_raw());
-        }
+    #[must_use]
+    pub const fn without(self, signal: Signal) -> Self {
+        Self(self.0.with(signal, false))
+    }
+
+    /// Inserts `signal` into `self`.
+    #[inline]
+    pub fn insert(&mut self, signal: Signal) {
+        self.0.set(signal, true);
+    }
+
+    /// Removes `signal` from `self`.
+    #[inline]
+    pub fn remove(&mut self, signal: Signal) {
+        self.0.set(signal, false);
+    }
+
+    /// Removes the first signal from `self`, returning it.
+    #[inline]
+    pub fn remove_first(&mut self) -> Option<Signal> {
+        self.0.pop_lsb()
+    }
+
+    /// Removes the last signal from `self`, returning it.
+    #[inline]
+    pub fn remove_last(&mut self) -> Option<Signal> {
+        self.0.pop_msb()
+    }
+
+    /// The number of signals in `self`.
+    #[inline]
+    pub const fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Returns `true` if there are no signals in `self`.
+    #[inline]
+    pub const fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+/// An iterator over a [`SignalSet`].
+///
+/// [`SignalSet`]: struct.SignalSet.html
+#[derive(Clone, Copy, Debug)]
+pub struct SignalSetIter(SignalSet);
+
+impl Iterator for SignalSetIter {
+    type Item = Signal;
+
+    #[inline]
+    fn next(&mut self) -> Option<Signal> {
+        self.0.remove_first()
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let len = self.0.len();
+        (len, Some(len))
+    }
+
+    #[inline]
+    fn count(self) -> usize {
+        self.0.len()
+    }
+
+    #[inline]
+    fn last(mut self) -> Option<Signal> {
+        self.next_back()
+    }
+}
+
+impl DoubleEndedIterator for SignalSetIter {
+    #[inline]
+    fn next_back(&mut self) -> Option<Signal> {
+        self.0.remove_last()
+    }
+}
+
+impl ExactSizeIterator for SignalSetIter {
+    #[inline]
+    fn len(&self) -> usize {
+        self.0.len()
     }
 }
