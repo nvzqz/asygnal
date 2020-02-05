@@ -81,16 +81,96 @@ signals! {
     /// The `SIGALRM` signal; sent when a real-time timer expires.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
     Alarm, alarm, SIGALRM;
 
     /// The `SIGCHLD` signal; sent when the status of a child process changes.
     ///
     /// **Default behavior:** ignored.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        // Varies but it should be safe to assume all "linux" targets have this.
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "vxworks",
+        all(
+            // Oddly enough, "x86_64" does not support this signal.
+            target_env = "uclibc",
+            any(
+                target_arch = "arm",
+                target_arch = "mips",
+                target_arch = "mips64",
+            ),
+        ),
+    ))]
     Child, child, SIGCHLD;
 
     /// The `SIGHUP` signal; sent when the terminal is disconnected.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
     Hangup, hangup, SIGHUP;
 
     /// The `SIGINFO` signal; sent to request a status update from the process.
@@ -118,18 +198,97 @@ signals! {
     /// **Keyboard shortcut:** `CTRL` + `C`.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        windows,
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
     Interrupt, interrupt, SIGINT;
 
     /// The `SIGIO` signal; sent when I/O operations are possible on some file
     /// descriptor.
     ///
     /// **Default behavior:** ignored.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        // Varies but it should be safe to assume all "linux" targets have this.
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        all(
+            // Oddly enough, "x86_64" does not support this signal.
+            target_env = "uclibc",
+            any(
+                target_arch = "arm",
+                target_arch = "mips",
+                target_arch = "mips64",
+            ),
+        ),
+    ))]
     Io, io, SIGIO;
 
     /// The `SIGPIPE` signal; sent when the process attempts to write to a pipe
     /// which has no reader.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
     Pipe, pipe, SIGPIPE;
 
     /// The `SIGQUIT` signal; sent to issue a shutdown of the process, after
@@ -138,26 +297,168 @@ signals! {
     /// **Keyboard shortcut:** `CTRL` + `\`.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
     Quit, quit, SIGQUIT;
 
     /// The `SIGTERM` signal; sent to issue a shutdown of the process.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        windows,
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
     Terminate, terminate, SIGTERM;
 
     /// The `SIGUSR1` signal; a user defined signal.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        // Varies but it should be safe to assume all "linux" targets have this.
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        all(
+            // Oddly enough, "x86_64" does not support this signal.
+            target_env = "uclibc",
+            any(
+                target_arch = "arm",
+                target_arch = "mips",
+                target_arch = "mips64",
+            ),
+        ),
+    ))]
     UserDefined1, user_defined_1, SIGUSR1;
 
     /// The `SIGUSR2` signal; a user defined signal.
     ///
     /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        // Varies but it should be safe to assume all "linux" targets have this.
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        all(
+            // Oddly enough, "x86_64" does not support this signal.
+            target_env = "uclibc",
+            any(
+                target_arch = "arm",
+                target_arch = "mips",
+                target_arch = "mips64",
+            ),
+        ),
+    ))]
     UserDefined2, user_defined_2, SIGUSR2;
 
     /// The `SIGWINCH` signal; sent when the terminal window is resized.
     ///
     /// **Default behavior:** ignored.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        // Varies but it should be safe to assume all "linux" targets have this.
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        all(
+            // Oddly enough, "x86_64" does not support this signal.
+            target_env = "uclibc",
+            any(
+                target_arch = "arm",
+                target_arch = "mips",
+                target_arch = "mips64",
+            ),
+        ),
+    ))]
     WindowChange, window_change, SIGWINCH;
 }
 
