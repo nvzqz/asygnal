@@ -28,9 +28,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        rust:
-          - stable
-          - nightly
         os:
           - ubuntu-latest
           - macos-latest
@@ -40,7 +37,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
       - uses: actions-rs/cargo@v1
         with:
