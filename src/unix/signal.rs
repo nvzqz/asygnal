@@ -177,6 +177,37 @@ signals! {
     ))]
     Child, child, SIGCHLD;
 
+    /// The `SIGFPE` ("floating point exception") signal; sent when the process
+    /// executes an erroneous arithmetic operation, such as division by zero.
+    ///
+    /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        windows,
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
+    Fpe, fpe, SIGFPE;
+
     /// The `SIGHUP` signal; sent when the terminal is disconnected.
     ///
     /// **Default behavior:** process termination.
@@ -205,6 +236,41 @@ signals! {
         target_env = "uclibc",
     ))]
     Hangup, hangup, SIGHUP;
+
+    /// The `SIGILL` signal; sent when the process attempts to execute an
+    /// **illegal**, malformed, unknown, or privileged instruction.
+    ///
+    /// This exists mainly for completeness. Handling this signal is *very
+    /// difficult* and should be done with great care. You probably just want to
+    /// just let the default handler deal with it.
+    ///
+    /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        windows,
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
+    Illegal, illegal, SIGILL;
 
     /// The `SIGINFO` signal; sent to request a status update from the process.
     ///
@@ -355,6 +421,41 @@ signals! {
         target_env = "uclibc",
     ))]
     Quit, quit, SIGQUIT;
+
+    /// The `SIGSEGV` signal; sent when the process has attempted to access a
+    /// restricted area of memory.
+    ///
+    /// This exists mainly for completeness. Handling this signal is *very
+    /// difficult* and should be done with great care. You probably just want to
+    /// just let the default handler deal with it.
+    ///
+    /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        windows,
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
+    SegViolation, seg_violation, SIGSEGV;
 
     /// The `SIGTERM` signal; sent to issue a shutdown of the process.
     ///
