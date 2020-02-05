@@ -67,8 +67,8 @@ macro_rules! signals {
                     #[cfg(any(docsrs, $cfg))]
                     #[cfg_attr(docsrs, doc(cfg($cfg)))]
                 )?
-                #[must_use]
                 #[inline]
+                #[must_use]
                 pub const fn $method(self) -> Self {
                     self.with(Signal::$variant)
                 }
