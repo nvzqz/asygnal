@@ -19,7 +19,7 @@ impl Writer {
     ///
     /// It is imperative that this function is signal-safe.
     #[inline]
-    pub fn wake(&self) {
+    pub fn wake(self) {
         let buf: [u8; 1] = [1u8];
         unsafe {
             // Wake up any reader. Any errors are ignored since it's likely a
