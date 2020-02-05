@@ -22,6 +22,11 @@ impl SignalMask {
     }
 
     #[inline]
+    pub const fn full() -> Self {
+        Self(!(!0u32 << Signal::NUM))
+    }
+
+    #[inline]
     pub const fn from_signal(signal: Signal) -> Self {
         Self(1 << signal as u32)
     }
@@ -149,5 +154,28 @@ impl AtomicSignalMask {
     #[inline]
     pub fn contains_any(&self, mask: SignalMask, ordering: Ordering) -> bool {
         SignalMask(self.0.load(ordering)).contains_any(mask)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn full() {
+        let mut full = SignalMask::full();
+        assert_eq!(full.len(), Signal::NUM);
+
+        while let Some(signal) = full.pop_lsb() {
+            // This assumes that the value is still the same, even for an
+            // invalid representation.
+            let signal = signal as u32;
+
+            assert!(
+                Signal::from_u32(signal).is_some(),
+                "Found incorrect signal {} in mask",
+                signal
+            );
+        }
     }
 }

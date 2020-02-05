@@ -68,6 +68,13 @@ impl SignalSet {
         Self(SignalMask::empty())
     }
 
+    /// Creates a new set with all signals enabled.
+    #[inline]
+    #[must_use]
+    pub const fn all() -> Self {
+        Self(SignalMask::full())
+    }
+
     /// Converts `self` into a raw signal set.
     pub fn into_raw(self) -> libc::sigset_t {
         let mut set = unsafe {
