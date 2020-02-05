@@ -36,7 +36,10 @@ macro_rules! kinds {
             /// Attempts to create an instance if `signal` is known.
             pub fn from_raw(signal: c_int) -> Option<Self> {
                 match signal {
-                    $(libc::$libc => Some(Self::$name),)+
+                    $(
+                        $(#[cfg($cfg)])?
+                        libc::$libc => Some(Self::$name),
+                    )+
                     _ => None,
                 }
             }
