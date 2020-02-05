@@ -82,11 +82,19 @@ kinds! {
     /// **Keyboard shortcut:** `CTRL` + `T`.
     ///
     /// **Default behavior:** ignored.
-    #[cfg(not(any(
-        target_os = "android",
-        target_os = "emscripten",
-        target_os = "linux",
-    )))]
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+    ))]
     Info, SIGINFO;
 
     /// The `SIGINT` signal; sent to interrupt a program.
