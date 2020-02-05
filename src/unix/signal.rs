@@ -78,6 +78,39 @@ macro_rules! signals {
 }
 
 signals! {
+    /// The `SIGABRT` signal; sent when the process calls `abort()`.
+    ///
+    /// If you choose to register a handler for this signal, it is *highly*
+    /// recommended to actually terminate the process.
+    ///
+    /// **Default behavior:** process termination.
+    #[cfg(any(
+        // According to `libc`:
+        // "bsd"
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "openbsd",
+        target_os = "netbsd",
+        // "linux-like"
+        target_os = "linux",
+        target_os = "android",
+        target_os = "emscripten",
+        // "solarish"
+        target_os = "solaris",
+        target_os = "illumos",
+        // Uncategorized
+        windows,
+        target_os = "fuchsia",
+        target_os = "redox",
+        target_os = "haiku",
+        target_os = "hermit",
+        target_os = "vxworks",
+        target_env = "uclibc",
+    ))]
+    Abort, abort, SIGABRT;
+
     /// The `SIGALRM` signal; sent when a real-time timer expires.
     ///
     /// **Default behavior:** process termination.
