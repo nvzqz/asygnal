@@ -187,3 +187,54 @@ impl Signal {
         crate::once::unix::SignalOnce::register(self)
     }
 }
+
+macro_rules! from_int {
+    ($(
+        $(#[$meta:meta])+
+        $method:ident, $int:ty;
+    )+) => {
+        /// Conversions from the integer value. This is **not** the same as the
+        /// raw `libc` value.
+        impl Signal {
+            $(
+                $(#[$meta])+
+                #[inline]
+                pub fn $method(signal: $int) -> Option<Self> {
+                    // Fine since `MAX_VALUE` is less than `i8::MAX_VALUE`.
+                    if signal <= Self::MAX_VALUE as $int {
+                        Some(unsafe { mem::transmute(signal as u8) })
+                    } else {
+                        None
+                    }
+                }
+            )+
+        }
+    };
+}
+
+from_int! {
+    /// Creates an instance from an unsigned 8-bit integer.
+    from_u8, u8;
+    /// Creates an instance from a signed 8-bit integer.
+    from_i8, i8;
+    /// Creates an instance from an unsigned 16-bit integer.
+    from_u16, u16;
+    /// Creates an instance from a signed 16-bit integer.
+    from_i16, i16;
+    /// Creates an instance from an unsigned 32-bit integer.
+    from_u32, u32;
+    /// Creates an instance from a signed 32-bit integer.
+    from_i32, i32;
+    /// Creates an instance from an unsigned 64-bit integer.
+    from_u64, u64;
+    /// Creates an instance from a signed 64-bit integer.
+    from_i64, i64;
+    /// Creates an instance from an unsigned 128-bit integer.
+    from_u128, u128;
+    /// Creates an instance from a signed 128-bit integer.
+    from_i128, i128;
+    /// Creates an instance from an unsigned pointer-sized integer.
+    from_usize, usize;
+    /// Creates an instance from a signed pointer-sized integer.
+    from_isize, isize;
+}
