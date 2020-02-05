@@ -50,18 +50,18 @@ impl SignalMask {
 
     /// Returns the number of signals in `self`.
     #[inline]
-    pub const fn len(&self) -> usize {
+    pub const fn len(self) -> usize {
         self.0.count_ones() as usize
     }
 
     #[inline]
-    pub const fn is_empty(&self) -> bool {
+    pub const fn is_empty(self) -> bool {
         self.0 == 0
     }
 
     /// Returns the least significant bit of `self`.
     #[inline]
-    fn lsb(&self) -> Option<Signal> {
+    fn lsb(self) -> Option<Signal> {
         if self.is_empty() {
             None
         } else {
@@ -71,7 +71,7 @@ impl SignalMask {
 
     /// Returns the most significant bit of `self`.
     #[inline]
-    fn msb(&self) -> Option<Signal> {
+    fn msb(self) -> Option<Signal> {
         if self.is_empty() {
             None
         } else {
@@ -82,14 +82,14 @@ impl SignalMask {
     /// Returns the least significant bit of `self` without checking whether
     /// `self` is empty.
     #[inline]
-    unsafe fn lsb_unchecked(&self) -> Signal {
+    unsafe fn lsb_unchecked(self) -> Signal {
         Signal::from_u8_unchecked(self.0.trailing_zeros() as u8)
     }
 
     /// Returns the least significant bit of `self` without checking whether
     /// `self` is empty.
     #[inline]
-    unsafe fn msb_unchecked(&self) -> Signal {
+    unsafe fn msb_unchecked(self) -> Signal {
         let bits = mem::size_of::<Self>() * 8 - 1;
         let signal = bits - self.0.leading_zeros() as usize;
         Signal::from_u8_unchecked(signal as u8)

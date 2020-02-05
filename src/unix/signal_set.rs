@@ -288,13 +288,13 @@ impl SignalSet {
 
     /// The number of signals in `self`.
     #[inline]
-    pub const fn len(&self) -> usize {
+    pub const fn len(self) -> usize {
         self.0.len()
     }
 
     /// Returns `true` if there are no signals in `self`.
     #[inline]
-    pub const fn is_empty(&self) -> bool {
+    pub const fn is_empty(self) -> bool {
         self.0.is_empty()
     }
 }
