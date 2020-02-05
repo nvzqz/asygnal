@@ -6,7 +6,7 @@ use super::libc_polyfill as libc;
 
 use libc::c_int;
 
-macro_rules! kinds {
+macro_rules! signals {
     ($(
         $(#[doc = $doc:literal])+
         $(#[cfg($cfg:meta)])?
@@ -61,7 +61,7 @@ macro_rules! kinds {
     };
 }
 
-kinds! {
+signals! {
     /// The `SIGALRM` signal; sent when a real-time timer expires.
     ///
     /// **Default behavior:** process termination.
