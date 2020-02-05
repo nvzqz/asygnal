@@ -83,7 +83,7 @@ impl Evented for Reader {
     target_os = "solaris",
     target_os = "illumos",
 ))]
-fn pipe_impl() -> io::Result<Pipe> {
+fn pipe_impl() -> io::Result<(Reader, Writer)> {
     let [reader, writer] = {
         let flags = libc::O_NONBLOCK | libc::O_CLOEXEC;
 
