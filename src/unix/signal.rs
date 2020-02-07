@@ -34,6 +34,22 @@ macro_rules! signals {
 
         /// Handling of raw signal values from `libc`.
         impl Signal {
+            /// Number of supported signals.
+            pub(crate) const NUM: usize = {
+                // Create a duplicate enum except with an explicit final value
+                // that is not conditionally compiled. This ensures we can get
+                // a max value regardless of target platform.
+                #[allow(warnings)]
+                enum Signal {
+                    $(
+                        $(#[cfg($cfg)])?
+                        $variant,
+                    )+
+                    Max,
+                }
+                Signal::Max as usize
+            };
+
             /// Attempts to create an instance if `signal` is known.
             pub fn from_raw(signal: c_int) -> Option<Self> {
                 match signal {
@@ -597,12 +613,6 @@ signals! {
 }
 
 impl Signal {
-    /// The maximum supported signal.
-    pub(crate) const MAX_VALUE: Self = Self::WindowChange;
-
-    /// Number of supported signals.
-    pub(crate) const NUM: usize = 1 + Self::MAX_VALUE as usize;
-
     #[inline]
     pub(crate) unsafe fn from_u8_unchecked(signal: u8) -> Self {
         mem::transmute(signal)
@@ -636,7 +646,7 @@ macro_rules! from_int {
                 #[inline]
                 pub fn $method(signal: $int) -> Option<Self> {
                     // Fine since `MAX_VALUE` is less than `i8::MAX_VALUE`.
-                    if signal <= Self::MAX_VALUE as $int {
+                    if signal < Self::NUM as $int {
                         Some(unsafe { mem::transmute(signal as u8) })
                     } else {
                         None
