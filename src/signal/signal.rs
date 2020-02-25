@@ -1161,7 +1161,7 @@ macro_rules! from_int {
                 pub fn $method(signal: $int) -> Option<Self> {
                     // Fine since `MAX_VALUE` is less than `i8::MAX_VALUE`.
                     if signal < Self::NUM as $int {
-                        Some(unsafe { mem::transmute(signal as u8) })
+                        Some(unsafe { Self::from_u8_unchecked(signal as u8) })
                     } else {
                         None
                     }
