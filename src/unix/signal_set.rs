@@ -16,6 +16,13 @@ impl From<Signal> for SignalSet {
     }
 }
 
+impl From<SignalSetIter> for SignalSet {
+    #[inline]
+    fn from(iter: SignalSetIter) -> Self {
+        iter.into_signal_set()
+    }
+}
+
 impl fmt::Debug for SignalSet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_set().entries(self.into_iter()).finish()
@@ -233,6 +240,13 @@ impl SignalSet {
 #[derive(Clone, Copy, Debug)]
 pub struct SignalSetIter(SignalSet);
 
+impl From<SignalSet> for SignalSetIter {
+    #[inline]
+    fn from(signals: SignalSet) -> Self {
+        Self(signals)
+    }
+}
+
 impl Iterator for SignalSetIter {
     type Item = Signal;
 
@@ -269,5 +283,19 @@ impl ExactSizeIterator for SignalSetIter {
     #[inline]
     fn len(&self) -> usize {
         self.0.len()
+    }
+}
+
+impl SignalSetIter {
+    /// Creates a new iterator for `signals`.
+    #[inline]
+    pub const fn new(signals: SignalSet) -> Self {
+        Self(signals)
+    }
+
+    /// Returns the remaining set of signals.
+    #[inline]
+    pub const fn into_signal_set(self) -> SignalSet {
+        self.0
     }
 }
