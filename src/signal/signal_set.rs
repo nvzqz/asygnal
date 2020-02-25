@@ -5,7 +5,7 @@ use super::{signal_mask::SignalMask, Signal};
 /// A set of signals supported by this library.
 ///
 /// Signals that cannot be handled are not listed as methods.
-#[derive(Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct SignalSet(pub(crate) SignalMask);
 
@@ -57,13 +57,6 @@ impl Extend<Signal> for SignalSet {
         I: IntoIterator<Item = Signal>,
     {
         iter.into_iter().for_each(|signal| self.insert(signal));
-    }
-}
-
-impl Default for SignalSet {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
     }
 }
 
