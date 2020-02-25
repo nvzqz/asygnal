@@ -237,7 +237,7 @@ impl SignalSet {
 /// An iterator over a [`SignalSet`].
 ///
 /// [`SignalSet`]: struct.SignalSet.html
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SignalSetIter(SignalSet);
 
 impl From<SignalSet> for SignalSetIter {
