@@ -1139,7 +1139,8 @@ impl Signal {
     ///
     /// After the `SignalOnce` is fulfilled, all subsequent polls will return
     /// `Ready`.
-    #[cfg(feature = "once")]
+    #[cfg(any(docsrs, feature = "once"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "once")))]
     pub fn register_once(
         self,
     ) -> Result<
