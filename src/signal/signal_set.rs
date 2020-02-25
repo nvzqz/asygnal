@@ -25,7 +25,7 @@ impl From<SignalSetIter> for SignalSet {
 
 impl fmt::Debug for SignalSet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_set().entries(self.into_iter()).finish()
+        f.debug_set().entries(*self).finish()
     }
 }
 
