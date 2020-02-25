@@ -19,6 +19,10 @@ macro_rules! signals {
         /// on the target platform. This is deliberate. Call the
         /// [`into_raw`](#method.into_raw) method to get the raw signal value
         /// for the target platform.
+        ///
+        /// See ["POSIX Signals"][posix_signals] for more info on some of these.
+        ///
+        /// [posix_signals]: https://en.wikipedia.org/wiki/Signal_(IPC)#POSIX_signals
         #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
         #[non_exhaustive]
         pub enum Signal {
