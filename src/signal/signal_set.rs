@@ -85,8 +85,8 @@ impl SignalSet {
     /// - [`profile`](#method.profile)
     /// - [`quit`](#method.quit)
     /// - [`terminate`](#method.terminate)
-    /// - [`user_defined_1`](#method.user_defined_1)
-    /// - [`user_defined_2`](#method.user_defined_2)
+    /// - [`user_def_1`](#method.user_def_1)
+    /// - [`user_def_2`](#method.user_def_2)
     /// - [`vt_alarm`](#method.vt_alarm)
     ///
     /// If a listed signal is not available for the current target, the returned
