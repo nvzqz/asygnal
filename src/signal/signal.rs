@@ -36,24 +36,23 @@ macro_rules! signals {
             )+
         }
 
+        const SIGNAL_NUM: usize = {
+            // Create a duplicate enum except with an explicit final value
+            // that is not conditionally compiled. This ensures we can get
+            // a max value regardless of target platform.
+            #[allow(warnings)]
+            enum Signal {
+                $(
+                    $(#[cfg($cfg)])?
+                    $variant,
+                )+
+                Max,
+            }
+            Signal::Max as usize
+        };
+
         /// Handling of raw signal values from `libc`.
         impl Signal {
-            /// Number of supported signals.
-            pub(crate) const NUM: usize = {
-                // Create a duplicate enum except with an explicit final value
-                // that is not conditionally compiled. This ensures we can get
-                // a max value regardless of target platform.
-                #[allow(warnings)]
-                enum Signal {
-                    $(
-                        $(#[cfg($cfg)])?
-                        $variant,
-                    )+
-                    Max,
-                }
-                Signal::Max as usize
-            };
-
             /// Attempts to create an instance if `signal` is known.
             pub fn from_raw(signal: c_int) -> Option<Self> {
                 match signal {
@@ -1119,6 +1118,12 @@ signals! {
 }
 
 impl Signal {
+    /// The number of supported signals.
+    ///
+    /// This value is exempted from [semantic versioning](https://semver.org)
+    /// because it may change in the future as more signals are added.
+    pub const NUM: usize = SIGNAL_NUM;
+
     /// Returns the set of all supported signals.
     #[inline]
     pub const fn all() -> SignalSet {

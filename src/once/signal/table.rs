@@ -1,5 +1,5 @@
 use crate::{
-    signal::{signal_mask::AtomicSignalMask, Signal, SignalTable},
+    signal::{signal_mask::AtomicSignalMask, Signal, SignalArray},
     unix::pipe::Writer,
 };
 use std::sync::atomic::{AtomicI32, Ordering};
@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicI32, Ordering};
 pub(crate) struct Table {
     pub registered: AtomicSignalMask,
     pub caught: AtomicSignalMask,
-    entries: SignalTable<Entry>,
+    entries: SignalArray<Entry>,
 }
 
 impl Table {
