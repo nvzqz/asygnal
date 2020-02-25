@@ -1119,6 +1119,12 @@ signals! {
 }
 
 impl Signal {
+    /// Returns the set of all supported signals.
+    #[inline]
+    pub const fn all() -> SignalSet {
+        SignalSet::all()
+    }
+
     #[inline]
     pub(crate) unsafe fn from_u8_unchecked(signal: u8) -> Self {
         mem::transmute(signal)
