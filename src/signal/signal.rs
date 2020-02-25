@@ -1132,10 +1132,10 @@ impl Signal {
     pub fn register_once(
         self,
     ) -> Result<
-        crate::once::unix::SignalOnce,
-        crate::once::unix::RegisterOnceError,
+        crate::once::signal::SignalOnce,
+        crate::once::signal::RegisterOnceError,
     > {
-        crate::once::unix::SignalOnce::register(self)
+        crate::once::signal::SignalOnce::register(self)
     }
 }
 

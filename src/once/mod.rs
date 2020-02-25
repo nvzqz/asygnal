@@ -6,12 +6,10 @@ use std::{
     task::{Context, Poll},
 };
 
-#[cfg(any(unix, docsrs))]
-#[cfg_attr(docsrs, doc(cfg(unix)))]
-pub mod unix;
+pub mod signal;
 
 #[cfg(unix)]
-type CtrlCOnceInner = unix::SignalSetOnce;
+type CtrlCOnceInner = signal::SignalSetOnce;
 
 /// A future that is fulfilled once upon receiving `CTRL` + `C`.
 ///
@@ -38,9 +36,8 @@ impl CtrlCOnce {
         // Register via `Signal` instead of `SignalSet` since it's slightly more
         // efficient.
         #[cfg(unix)]
-        let inner = unix::SignalSetOnce::from(
-            crate::unix::Signal::Interrupt.register_once()?,
-        );
+        let inner: signal::SignalSetOnce =
+            crate::Signal::Interrupt.register_once()?.into();
 
         Ok(Self(inner))
     }
@@ -64,14 +61,14 @@ impl CtrlCOnce {
     #[inline]
     pub fn register_termination() -> Result<Self, RegisterCtrlCOnceError> {
         #[cfg(unix)]
-        let inner = crate::unix::SignalSet::termination().register_once()?;
+        let inner = crate::SignalSet::termination().register_once()?;
 
         Ok(Self(inner))
     }
 }
 
 #[cfg(unix)]
-type RegisterCtrlCOnceErrorInner = unix::RegisterOnceError;
+type RegisterCtrlCOnceErrorInner = signal::RegisterOnceError;
 
 /// An error returned when registering a [`Signal`] or [`SignalSet`] fails.
 ///

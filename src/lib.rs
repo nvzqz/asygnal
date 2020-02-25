@@ -12,9 +12,10 @@
 #[cfg_attr(docsrs, doc(cfg(feature = "once")))]
 pub mod once;
 
-#[cfg(any(unix, docsrs))]
-#[cfg_attr(docsrs, doc(cfg(unix)))]
-pub mod unix;
+pub mod signal;
+pub use signal::{Signal, SignalSet};
 
+#[cfg(unix)]
+mod unix;
 #[cfg(windows)]
 mod windows;

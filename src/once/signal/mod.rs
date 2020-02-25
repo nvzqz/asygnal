@@ -7,7 +7,7 @@ use std::{
 };
 use tokio::io::PollEvented;
 
-use crate::unix::{pipe, Signal, SignalSet};
+use crate::{unix::pipe, Signal, SignalSet};
 
 mod signal;
 mod signal_set;

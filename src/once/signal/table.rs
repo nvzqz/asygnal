@@ -1,5 +1,6 @@
-use crate::unix::{
-    pipe::Writer, signal_mask::AtomicSignalMask, Signal, SignalTable,
+use crate::{
+    signal::{signal_mask::AtomicSignalMask, Signal, SignalTable},
+    unix::pipe::Writer,
 };
 use std::sync::atomic::{AtomicI32, Ordering};
 

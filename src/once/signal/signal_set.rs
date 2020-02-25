@@ -6,7 +6,7 @@ use std::{
 };
 
 use super::{table::Table, Driver, RegisterOnceError, SignalOnce};
-use crate::unix::{pipe, SignalSet};
+use crate::{unix::pipe, SignalSet};
 
 /// A future that is fulfilled once upon receiving a [`Signal`] in a
 /// [`SignalSet`].

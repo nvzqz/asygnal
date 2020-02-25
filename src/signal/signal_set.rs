@@ -177,10 +177,10 @@ impl SignalSet {
     pub fn register_once(
         self,
     ) -> Result<
-        crate::once::unix::SignalSetOnce,
-        crate::once::unix::RegisterOnceError,
+        crate::once::signal::SignalSetOnce,
+        crate::once::signal::RegisterOnceError,
     > {
-        crate::once::unix::SignalSetOnce::register(self)
+        crate::once::signal::SignalSetOnce::register(self)
     }
 
     /// Returns `self` with `signal` added or removed from it.
