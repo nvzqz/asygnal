@@ -89,10 +89,12 @@ impl SignalSet {
     /// - [`hangup`](#method.hangup)
     /// - [`interrupt`](#method.interrupt)
     /// - [`pipe`](#method.pipe)
+    /// - [`profile`](#method.profile)
     /// - [`quit`](#method.quit)
     /// - [`terminate`](#method.terminate)
     /// - [`user_defined_1`](#method.user_defined_1)
     /// - [`user_defined_2`](#method.user_defined_2)
+    /// - [`vt_alarm`](#method.vt_alarm)
     ///
     /// If a listed signal is not available for the current target, the returned
     /// set will simply not include it.
@@ -151,6 +153,40 @@ impl SignalSet {
             }
 
             set = set.interrupt().terminate();
+        }
+
+        #[cfg(any(
+            // According to `libc`:
+            // "bsd"
+            target_os = "macos",
+            target_os = "ios",
+            target_os = "freebsd",
+            target_os = "dragonfly",
+            target_os = "openbsd",
+            target_os = "netbsd",
+            // "linux-like"
+            target_os = "linux",
+            target_os = "android",
+            target_os = "emscripten",
+            // "solarish"
+            target_os = "solaris",
+            target_os = "illumos",
+            // Uncategorized
+            target_os = "fuchsia",
+            target_os = "redox",
+            target_os = "haiku",
+            all(
+                // Oddly enough, "x86_64" does not support this signal.
+                target_env = "uclibc",
+                any(
+                    target_arch = "arm",
+                    target_arch = "mips",
+                    target_arch = "mips64",
+                ),
+            ),
+        ))]
+        {
+            set = set.profile().vt_alarm();
         }
 
         set
