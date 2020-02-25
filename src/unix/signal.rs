@@ -98,6 +98,15 @@ macro_rules! signals {
 }
 
 signals! {
+    // Signals that cannot be handled must never be included.
+    //
+    // These are:
+    // - SIGKILL
+    // - SIGSTOP
+    //
+    // This library uses fixed-size tables based on the number of signals below.
+    // Including such signals would be a waste of space.
+
     /// The `SIGABRT` signal; sent when the process calls `abort()`.
     ///
     /// If you choose to register a handler for this signal, it is *highly*
