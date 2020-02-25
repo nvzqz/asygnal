@@ -90,7 +90,7 @@ macro_rules! signals {
                 #[inline]
                 #[must_use]
                 pub const fn $method(self) -> Self {
-                    self.with(Signal::$variant)
+                    self.with(Signal::$variant, true)
                 }
             )+
         }

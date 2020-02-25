@@ -39,11 +39,6 @@ impl SignalMask {
     }
 
     #[inline]
-    pub fn set(&mut self, signal: Signal, value: bool) {
-        *self = self.with(signal, value);
-    }
-
-    #[inline]
     pub const fn contains(self, signal: Signal) -> bool {
         self.contains_any(Self::from_signal(signal))
     }

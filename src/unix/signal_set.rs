@@ -46,7 +46,7 @@ impl FromIterator<Signal> for SignalSet {
         I: IntoIterator<Item = Signal>,
     {
         iter.into_iter()
-            .fold(Self::new(), |builder, signal| builder.with(signal))
+            .fold(Self::new(), |builder, signal| builder.with(signal, true))
     }
 }
 
@@ -183,30 +183,29 @@ impl SignalSet {
         crate::once::unix::SignalSetOnce::register(self)
     }
 
-    /// Returns `self` with `signal` added to it.
+    /// Returns `self` with `signal` added or removed from it.
     #[inline]
     #[must_use]
-    pub const fn with(self, signal: Signal) -> Self {
-        Self(self.0.with(signal, true))
+    pub const fn with(self, signal: Signal, value: bool) -> Self {
+        Self(self.0.with(signal, value))
     }
 
-    /// Returns `self` without `signal`.
+    /// Inserts or removes `signal` from `self`.
     #[inline]
-    #[must_use]
-    pub const fn without(self, signal: Signal) -> Self {
-        Self(self.0.with(signal, false))
+    pub fn set(&mut self, signal: Signal, value: bool) {
+        *self = self.with(signal, value);
     }
 
     /// Inserts `signal` into `self`.
     #[inline]
     pub fn insert(&mut self, signal: Signal) {
-        self.0.set(signal, true);
+        self.set(signal, true);
     }
 
     /// Removes `signal` from `self`.
     #[inline]
     pub fn remove(&mut self, signal: Signal) {
-        self.0.set(signal, false);
+        self.set(signal, false);
     }
 
     /// Removes the first signal from `self`, returning it.
