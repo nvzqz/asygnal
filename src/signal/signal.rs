@@ -1,10 +1,6 @@
 use super::SignalSet;
 use std::mem;
 
-// Required to enable polyfills on non-Unix platforms when documenting.
-#[cfg(not(unix))]
-use super::libc_polyfill as libc;
-
 use libc::c_int;
 
 macro_rules! signals {

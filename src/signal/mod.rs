@@ -13,10 +13,6 @@ pub(crate) mod signal_set;
 // after the initial `impl`.
 pub(crate) mod signal;
 
-// Required when documenting on non-Unix platforms.
-#[cfg(not(unix))]
-mod libc_polyfill;
-
 pub use {
     signal::Signal,
     signal_set::{SignalSet, SignalSetIter},
