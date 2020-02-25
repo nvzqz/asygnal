@@ -1,4 +1,4 @@
-use std::{fmt, iter::FromIterator, mem::MaybeUninit};
+use std::{fmt, iter::FromIterator};
 
 use super::{signal_mask::SignalMask, Signal};
 
@@ -189,19 +189,6 @@ impl SignalSet {
             set = set.profile().vt_alarm();
         }
 
-        set
-    }
-
-    /// Converts `self` into a raw signal set.
-    pub fn into_raw(self) -> libc::sigset_t {
-        let mut set = unsafe {
-            let mut set = MaybeUninit::<libc::sigset_t>::uninit();
-            libc::sigemptyset(set.as_mut_ptr());
-            set.assume_init()
-        };
-        for signal in self {
-            unsafe { libc::sigaddset(&mut set, signal.into_raw()) };
-        }
         set
     }
 
