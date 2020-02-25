@@ -107,7 +107,7 @@ signals! {
     /// If you choose to register a handler for this signal, it is *highly*
     /// recommended to actually terminate the process.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -137,7 +137,7 @@ signals! {
 
     /// The `SIGALRM` signal; sent when a real-time timer expires.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -168,7 +168,7 @@ signals! {
     /// due to incorrect memory access alignment or non-existent physical
     /// address.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     ///
     /// [bus error]: https://en.wikipedia.org/wiki/Bus_error
     #[cfg(any(
@@ -245,7 +245,7 @@ signals! {
     /// The `SIGCONT` signal; sent when the process is **continued** after being
     /// previously paused by the `SIGSTOP` or `SIGTSTP` signal.
     ///
-    /// **Default behavior:** ignored.
+    /// **Default behavior:** continue executing, if stopped.
     ///
     /// **Note:** the `Cont` and `cont` identifiers are used over `Continue` and
     /// `continue` because `continue` is a keyword in Rust.
@@ -287,7 +287,7 @@ signals! {
     /// process executes an erroneous arithmetic operation, such as division by
     /// zero.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -317,7 +317,7 @@ signals! {
 
     /// The `SIGHUP` signal; sent when the terminal is disconnected.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -351,7 +351,7 @@ signals! {
     /// difficult* and should be done with great care. You probably just want to
     /// just let the default handler deal with it.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -403,7 +403,7 @@ signals! {
     ///
     /// **Keyboard shortcut:** `CTRL` + `C`.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -470,7 +470,7 @@ signals! {
     /// The `SIGPIPE` signal; sent when the process attempts to write to a pipe
     /// which has no reader.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -526,7 +526,7 @@ signals! {
     /// The `SIGPROF` signal; sent when the limit for CPU time used by the
     /// process and by the system on behalf of the process elapses.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -565,7 +565,7 @@ signals! {
     ///
     /// **Keyboard shortcut:** `CTRL` + `\`.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -599,7 +599,7 @@ signals! {
     /// difficult* and should be done with great care. You probably just want to
     /// just let the default handler deal with it.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -668,6 +668,8 @@ signals! {
     TermStop, term_stop, SIGTSTP;
 
     /// The `SIGSYS` signal; sent when a non-existent system call is invoked.
+    ///
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -703,7 +705,7 @@ signals! {
 
     /// The `SIGTERM` signal; sent to issue a shutdown of the process.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -733,7 +735,7 @@ signals! {
 
     /// The `SIGTRAP` signal; sent when an exception (or **trap**) occurs.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -884,7 +886,7 @@ signals! {
     /// The `SIGVTALRM` signal; sent when the limit for CPU time used by the
     /// process elapses.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -920,7 +922,7 @@ signals! {
 
     /// The `SIGUSR1` signal; a user defined signal.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -956,7 +958,7 @@ signals! {
 
     /// The `SIGUSR2` signal; a user defined signal.
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate.
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -1002,7 +1004,7 @@ signals! {
     ///
     /// - `setrlimit(2)`
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
@@ -1043,7 +1045,7 @@ signals! {
     ///
     /// - `setrlimit(2)`
     ///
-    /// **Default behavior:** process termination.
+    /// **Default behavior:** terminate (core dump).
     #[cfg(any(
         // According to `libc`:
         // "bsd"
