@@ -283,8 +283,9 @@ signals! {
     ))]
     Cont, cont, SIGCONT;
 
-    /// The `SIGFPE` ("floating point exception") signal; sent when the process
-    /// executes an erroneous arithmetic operation, such as division by zero.
+    /// The `SIGFPE` ("**float**ing point **exc**eption") signal; sent when the
+    /// process executes an erroneous arithmetic operation, such as division by
+    /// zero.
     ///
     /// **Default behavior:** process termination.
     #[cfg(any(
@@ -312,7 +313,7 @@ signals! {
         target_os = "vxworks",
         target_env = "uclibc",
     ))]
-    Fpe, fpe, SIGFPE;
+    FloatExc, float_exc, SIGFPE;
 
     /// The `SIGHUP` signal; sent when the terminal is disconnected.
     ///
@@ -376,7 +377,7 @@ signals! {
         target_os = "vxworks",
         target_env = "uclibc",
     ))]
-    Illegal, illegal, SIGILL;
+    IllInstr, ill_instr, SIGILL;
 
     /// The `SIGINFO` signal; sent to request a status update from the process.
     ///
@@ -951,7 +952,7 @@ signals! {
             ),
         ),
     ))]
-    UserDefined1, user_defined_1, SIGUSR1;
+    UserDef1, user_def_1, SIGUSR1;
 
     /// The `SIGUSR2` signal; a user defined signal.
     ///
@@ -987,7 +988,7 @@ signals! {
             ),
         ),
     ))]
-    UserDefined2, user_defined_2, SIGUSR2;
+    UserDef2, user_def_2, SIGUSR2;
 
     /// The `SIGXCPU` signal; sent when the process has used up the CPU for a
     /// duration that **exceeds** a certain predetermined user-settable value.

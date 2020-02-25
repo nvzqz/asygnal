@@ -142,7 +142,7 @@ impl SignalSet {
                 ),
             ))]
             {
-                set = set.user_defined_1().user_defined_2();
+                set = set.user_def_1().user_def_2();
             }
 
             set = set.interrupt().terminate();
