@@ -47,4 +47,14 @@ impl AtomicSignalSet {
     ) -> SignalSet {
         SignalSet(self.0.fetch_or(signals.into().0, ordering))
     }
+
+    /// Atomically removes `signals` from `self` using `ordering`.
+    #[inline]
+    pub fn remove<S: Into<SignalSet>>(
+        &self,
+        signals: S,
+        ordering: Ordering,
+    ) -> SignalSet {
+        SignalSet(self.0.fetch_and(!signals.into().0, ordering))
+    }
 }
