@@ -1,18 +1,21 @@
-use std::{fmt, iter::FromIterator};
+use std::{fmt, iter::FromIterator, mem};
 
-use super::{signal_mask::SignalMask, Signal};
+use super::Signal;
+
+mod atomic;
+pub use atomic::*;
 
 /// A set of signals supported by this library.
 ///
 /// Signals that cannot be handled are not listed as methods.
 #[derive(Clone, Copy, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
-pub struct SignalSet(pub(crate) SignalMask);
+pub struct SignalSet(u32);
 
 impl From<Signal> for SignalSet {
     #[inline]
     fn from(signal: Signal) -> Self {
-        Self(signal.into())
+        Self::from_signal(signal)
     }
 }
 
@@ -46,7 +49,7 @@ impl FromIterator<Signal> for SignalSet {
         I: IntoIterator<Item = Signal>,
     {
         iter.into_iter()
-            .fold(Self::new(), |builder, signal| builder.with(signal, true))
+            .fold(Self::new(), |builder, signal| builder.with(signal))
     }
 }
 
@@ -61,18 +64,24 @@ impl Extend<Signal> for SignalSet {
 }
 
 impl SignalSet {
-    /// Creates a new, empty signal set builder.
+    /// Creates a new, empty signal set.
     #[inline]
     #[must_use]
     pub const fn new() -> Self {
-        Self(SignalMask::empty())
+        Self(0)
     }
 
     /// Creates a new set with all signals enabled.
     #[inline]
     #[must_use]
     pub const fn all() -> Self {
-        Self(SignalMask::full())
+        Self(!(!0u32 << Signal::NUM))
+    }
+
+    /// Creates a new set with `signal` enabled.
+    #[inline]
+    pub const fn from_signal(signal: Signal) -> Self {
+        Self(1 << signal as u32)
     }
 
     /// Creates a new set of signals that result in process termination.
@@ -200,53 +209,155 @@ impl SignalSet {
         crate::once::signal::SignalSetOnce::register(self)
     }
 
-    /// Returns `self` with `signal` added or removed from it.
+    /// Returns `self` with `signal` added to or removed from it.
     #[inline]
     #[must_use]
-    pub const fn with(self, signal: Signal, value: bool) -> Self {
-        Self(self.0.with(signal, value))
+    pub const fn setting(mut self, signal: Signal, value: bool) -> Self {
+        let signal = signal as u32;
+        self.0 = (self.0 & !(1 << signal)) | ((value as u32) << signal);
+        self
     }
 
     /// Inserts or removes `signal` from `self`.
     #[inline]
     pub fn set(&mut self, signal: Signal, value: bool) {
-        *self = self.with(signal, value);
+        *self = self.setting(signal, value);
+    }
+
+    /// Returns `self` with `signal` added to it.
+    #[inline]
+    #[must_use]
+    pub const fn with(self, signal: Signal) -> Self {
+        self.setting(signal, true)
     }
 
     /// Inserts `signal` into `self`.
     #[inline]
-    pub fn insert(&mut self, signal: Signal) {
-        self.set(signal, true);
+    pub fn insert<S: Into<SignalSet>>(&mut self, signals: S) {
+        self.0 |= signals.into().0;
     }
 
-    /// Removes `signal` from `self`.
+    /// Returns `self` with `signal` removed from it.
     #[inline]
-    pub fn remove(&mut self, signal: Signal) {
-        self.set(signal, false);
+    #[must_use]
+    pub const fn without(self, signal: Signal) -> Self {
+        self.setting(signal, false)
     }
 
-    /// Removes the first signal from `self`, returning it.
+    /// Returns `self` with all of `signals` removed from it.
     #[inline]
-    pub fn remove_first(&mut self) -> Option<Signal> {
-        self.0.pop_lsb()
+    #[must_use]
+    pub const fn without_all(self, signals: SignalSet) -> Self {
+        Self(self.0 & !signals.0)
     }
 
-    /// Removes the last signal from `self`, returning it.
+    /// Removes `signals` from `self`.
     #[inline]
-    pub fn remove_last(&mut self) -> Option<Signal> {
-        self.0.pop_msb()
+    pub fn remove<S: Into<SignalSet>>(&mut self, signals: S) {
+        self.0 &= !signals.into().0;
+    }
+
+    /// Returns the least significant signal bit of `self`.
+    #[inline]
+    pub fn first(self) -> Option<Signal> {
+        if self.is_empty() {
+            None
+        } else {
+            unsafe { Some(self.first_unchecked()) }
+        }
+    }
+
+    /// Returns the least significant signal bit of `self`, assuming `self` is
+    /// not empty.
+    #[inline]
+    pub unsafe fn first_unchecked(self) -> Signal {
+        Signal::from_u8_unchecked(self.0.trailing_zeros() as u8)
+    }
+
+    /// Removes the least significant signal bit from `self`, returning it.
+    #[inline]
+    #[must_use = "use 'remove_first' instead"]
+    pub fn pop_first(&mut self) -> Option<Signal> {
+        // Explicitly removing the lsb is slightly more efficient than toggling.
+        let lsb = self.first()?;
+        self.remove_first();
+        Some(lsb)
+    }
+
+    /// Returns `self` with the least significant bit removed from it.
+    #[inline]
+    #[must_use]
+    pub const fn without_first(self) -> Self {
+        Self(self.0 & self.0.wrapping_sub(1))
+    }
+
+    /// Removes the least significant signal bit from `self`, without returning
+    /// it.
+    #[inline]
+    pub fn remove_first(&mut self) {
+        *self = self.without_first();
+    }
+
+    /// Returns the most significant signal bit of `self`.
+    #[inline]
+    pub fn last(self) -> Option<Signal> {
+        if self.is_empty() {
+            None
+        } else {
+            unsafe { Some(self.last_unchecked()) }
+        }
+    }
+
+    /// Returns the most significant signal bit of `self`, assuming `self` is
+    /// not empty.
+    #[inline]
+    pub unsafe fn last_unchecked(self) -> Signal {
+        let bits = mem::size_of::<Self>() * 8 - 1;
+        let signal = bits - self.0.leading_zeros() as usize;
+        Signal::from_u8_unchecked(signal as u8)
+    }
+
+    /// Removes the most significant signal signal from `self`, returning it.
+    #[inline]
+    #[must_use = "use 'remove_last' instead"]
+    pub fn pop_last(&mut self) -> Option<Signal> {
+        let msb = self.last()?;
+        self.0 ^= Self::from_signal(msb).0;
+        Some(msb)
+    }
+
+    /// Removes the most significant signal from `self`, without returning it.
+    #[inline]
+    pub fn remove_last(&mut self) {
+        // This method exists for consistency with `remove_first`. This is the
+        // currently known fastest way to remove the last bit.
+        let _ = self.pop_last();
     }
 
     /// The number of signals in `self`.
     #[inline]
     pub const fn len(self) -> usize {
-        self.0.len()
+        self.0.count_ones() as usize
     }
 
     /// Returns `true` if there are no signals in `self`.
     #[inline]
     pub const fn is_empty(self) -> bool {
-        self.0.is_empty()
+        self.0 == 0
+    }
+
+    /// Returns `true` if `signal` is stored in `self`.
+    #[inline]
+    pub const fn contains(self, signal: Signal) -> bool {
+        self.contains_any(Self::from_signal(signal))
+    }
+
+    /// Returns `true` if any [`Signal`] in `signals` is stored in `self`.
+    ///
+    /// [`Signal`]: struct.Signal.html
+    #[inline]
+    pub const fn contains_any(self, signals: SignalSet) -> bool {
+        self.0 & signals.0 != 0
     }
 }
 
@@ -268,7 +379,7 @@ impl Iterator for SignalSetIter {
 
     #[inline]
     fn next(&mut self) -> Option<Signal> {
-        self.0.remove_first()
+        self.0.pop_first()
     }
 
     #[inline]
@@ -291,7 +402,7 @@ impl Iterator for SignalSetIter {
 impl DoubleEndedIterator for SignalSetIter {
     #[inline]
     fn next_back(&mut self) -> Option<Signal> {
-        self.0.remove_last()
+        self.0.pop_last()
     }
 }
 
@@ -313,5 +424,29 @@ impl SignalSetIter {
     #[inline]
     pub const fn into_signal_set(self) -> SignalSet {
         self.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn all() {
+        let all = SignalSet::all();
+        assert_eq!(all.len(), Signal::NUM);
+
+        fn assert(signal: u32) {
+            assert!(
+                Signal::from_u32(signal).is_some(),
+                "Found incorrect signal {} in mask",
+                signal
+            );
+        }
+
+        // This assumes that the signal's enum value is still the same, even for
+        // an invalid representation.
+        all.into_iter().for_each(|s| assert(s as u32));
+        all.into_iter().rev().for_each(|s| assert(s as u32));
     }
 }

@@ -1,12 +1,12 @@
 use crate::{
-    signal::{signal_mask::AtomicSignalMask, Signal, SignalArray},
+    signal::{AtomicSignalSet, Signal, SignalArray},
     unix::pipe::Writer,
 };
 use std::sync::atomic::{AtomicI32, Ordering};
 
 pub(crate) struct Table {
-    pub registered: AtomicSignalMask,
-    pub caught: AtomicSignalMask,
+    pub registered: AtomicSignalSet,
+    pub caught: AtomicSignalSet,
     entries: SignalArray<Entry>,
 }
 
@@ -14,8 +14,8 @@ impl Table {
     #[inline]
     pub fn global() -> &'static Self {
         static GLOBAL: Table = Table {
-            registered: AtomicSignalMask::empty(),
-            caught: AtomicSignalMask::empty(),
+            registered: AtomicSignalSet::new(),
+            caught: AtomicSignalSet::new(),
             entries: [Entry::EMPTY; Signal::NUM],
         };
         &GLOBAL

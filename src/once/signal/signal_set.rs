@@ -38,7 +38,11 @@ impl Future for SignalSetOnce {
     fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
         let table = Table::global();
 
-        if table.caught.contains_any(self.signals.0, Ordering::SeqCst) {
+        if table
+            .caught
+            .load(Ordering::SeqCst)
+            .contains_any(self.signals)
+        {
             return Poll::Ready(());
         }
 

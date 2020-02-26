@@ -6,16 +6,15 @@
 
 #![cfg_attr(not(unix), allow(warnings))]
 
-pub(crate) mod signal_mask;
-pub(crate) mod signal_set;
+mod set;
 
-// Declare this after `signal_set` so that `SignalSet` methods inside can come
-// after the initial `impl`.
-pub(crate) mod signal;
+// Declare this after `set` so that `SignalSet` methods inside can come after
+// the initial `impl`.
+mod signal;
 
 pub use {
+    set::{AtomicSignalSet, SignalSet, SignalSetIter},
     signal::Signal,
-    signal_set::{SignalSet, SignalSetIter},
 };
 
 /// An array suitable for indexing with a [`Signal`] without bounds checks.

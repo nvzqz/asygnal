@@ -58,7 +58,7 @@ fn register_signal(signal: Signal) -> io::Result<RegisteredSignal> {
             let table = table::Table::global();
 
             // Set the flag before waking up the reading end.
-            table.caught.enable(signal, Ordering::SeqCst);
+            table.caught.insert(signal, Ordering::SeqCst);
             table.entry(signal).load_writer(Ordering::SeqCst).wake();
         }
     }
