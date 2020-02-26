@@ -1164,7 +1164,7 @@ impl Signal {
         SignalSet::all()
     }
 
-    // TODO: Make `const`; see https://github.com/rust-lang/rust/issues/53605.
+    // TODO(#2): Make `const`
     #[inline]
     pub(crate) unsafe fn from_u8_unchecked(signal: u8) -> Self {
         mem::transmute(signal)
@@ -1197,6 +1197,7 @@ macro_rules! from_int {
             $(
                 $(#[$meta])+
                 #[inline]
+                // TODO(#3): Make `const`
                 pub fn $method(signal: $int) -> Option<Self> {
                     // Fine since `MAX_VALUE` is less than `i8::MAX_VALUE`.
                     if signal < Self::NUM as $int {
