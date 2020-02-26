@@ -6,7 +6,8 @@
 #![deny(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-// mod ctrlc;
+#[macro_use]
+mod macros;
 
 #[cfg(any(docsrs, feature = "once"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "once")))]

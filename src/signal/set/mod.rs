@@ -198,17 +198,45 @@ impl SignalSet {
         set
     }
 
-    /// Converts `self` into a raw signal set.
-    pub fn into_raw(self) -> libc::sigset_t {
-        let mut set = unsafe {
-            let mut set = mem::MaybeUninit::<libc::sigset_t>::uninit();
-            libc::sigemptyset(set.as_mut_ptr());
-            set.assume_init()
-        };
-        for signal in self {
-            unsafe { libc::sigaddset(&mut set, signal.into_raw()) };
+    cfg_docs! {
+        /// Converts `self` into a raw signal set.
+        ///
+        /// Some platforms should have `sigset_t` but don't have it declared in
+        /// `libc` and thus this method isn't available for those. See
+        /// [this libc issue](https://github.com/rust-lang/libc/issues/1671) for
+        /// tracking this on NetBSD, FreeBSD, and DragonFly BSD.
+        #[cfg(any(
+            // According to `libc`:
+            // "apple"
+            target_os = "macos",
+            target_os = "ios",
+            // Only 1 in "netbsdlike"
+            target_os = "openbsd",
+            // "linux-like"
+            target_os = "linux",
+            target_os = "android",
+            target_os = "emscripten",
+            // "solarish"
+            target_os = "solaris",
+            target_os = "illumos",
+            // Uncategorized
+            target_os = "fuchsia",
+            target_os = "redox",
+            target_os = "haiku",
+            target_os = "hermit",
+            target_os = "vxworks",
+        ))]
+        pub fn into_raw(self) -> libc::sigset_t {
+            let mut set = unsafe {
+                let mut set = mem::MaybeUninit::<libc::sigset_t>::uninit();
+                libc::sigemptyset(set.as_mut_ptr());
+                set.assume_init()
+            };
+            for signal in self {
+                unsafe { libc::sigaddset(&mut set, signal.into_raw()) };
+            }
+            set
         }
-        set
     }
 
     /// Registers a signal handler that will only be fulfilled once.
