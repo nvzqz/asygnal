@@ -81,7 +81,7 @@ impl SignalSet {
     /// Creates a new set with `signal` enabled.
     #[inline]
     pub const fn from_signal(signal: Signal) -> Self {
-        Self(1 << signal as u32)
+        Self::new().with(signal)
     }
 
     /// Creates a new set of signals that result in process termination.
