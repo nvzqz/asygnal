@@ -30,26 +30,21 @@ impl Table {
 
 pub(crate) struct Entry {
     // TODO: Use `signalfd` on platforms that support it.
-    writer: AtomicI32,
+    /// The file descriptor for the writing end of the pipe.
+    pub writer_fd: AtomicI32,
 }
 
 impl Entry {
     #[allow(clippy::declare_interior_mutable_const)]
     const EMPTY: Self = Self {
-        writer: AtomicI32::new(0),
+        writer_fd: AtomicI32::new(0),
     };
-
-    /// Returns the file descriptor for the writing end of the pipe.
-    #[inline]
-    pub fn writer_fd(&self) -> &AtomicI32 {
-        &self.writer
-    }
 
     /// Returns the writing end of the pipe.
     #[inline]
     pub fn load_writer(&self, ordering: Ordering) -> Writer {
         // SAFETY: In the case that the file descriptor is 0, the `pipe::Writer`
         // still has a valid representation.
-        Writer(self.writer_fd().load(ordering))
+        Writer(self.writer_fd.load(ordering))
     }
 }

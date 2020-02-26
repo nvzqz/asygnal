@@ -57,7 +57,7 @@ impl SignalOnce {
 
         Table::global()
             .entry(signal)
-            .writer_fd()
+            .writer_fd
             .store(writer.0, Ordering::SeqCst);
 
         match super::register_signal(signal) {
