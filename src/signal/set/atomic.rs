@@ -2,7 +2,8 @@ use std::sync::atomic::{AtomicU32, Ordering};
 
 use super::SignalSet;
 
-/// A set of signals with atomic operations.
+/// Collection of signals supported by this library, backed by a cheap bit mask,
+/// with atomic operations.
 pub struct AtomicSignalSet(AtomicU32);
 
 impl From<SignalSet> for AtomicSignalSet {

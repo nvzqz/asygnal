@@ -5,9 +5,13 @@ use super::Signal;
 mod atomic;
 pub use atomic::*;
 
-/// A set of signals supported by this library.
+/// Collection of signals supported by this library, backed by a cheap bit mask.
 ///
-/// Signals that cannot be handled are not listed as methods.
+/// # Target Configuration
+///
+/// Signals that cannot be handled are not listed as methods. Each method has a
+/// configuration appropriate for what platforms it's supported on. For example,
+/// see [`SignalSet::abort`](#method.abort).
 #[derive(Clone, Copy, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct SignalSet(u32);

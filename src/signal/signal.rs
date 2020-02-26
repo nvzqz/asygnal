@@ -9,7 +9,25 @@ macro_rules! signals {
         $(#[cfg($cfg:meta)])?
         $variant:ident, $method:ident, $libc:ident;
     )+) => {
-        /// Signals supported by this library.
+        /// POSIX-style signals.
+        ///
+        /// # `SignalSet` Methods
+        ///
+        /// Each variant has an associated [`SignalSet`] builder-pattern method,
+        /// such as [`SignalSet::abort`] for [`Signal::Abort`]. See
+        /// ["Convenience Methods"](struct.SignalSet.html#convenience-methods).
+        ///
+        /// # Target Configuration
+        ///
+        /// We've already done the work of scouring [`libc` (0.2.66)] to match
+        /// the compilation targets for these signals. The `#[cfg(...)]` for
+        /// each is declared in `signals!` and can be found by clicking `[src]`
+        /// next to e.g. [`SignalSet::abort`].
+        ///
+        /// Please [submit an issue] (or better, a [pull request]!) for any
+        /// missing signals or configurations in [`asygnal`].
+        ///
+        /// # Raw Signal Value
         ///
         /// Note that the value, when casted to an integer, may vary depending
         /// on the target platform. This is deliberate. Call the
@@ -19,6 +37,16 @@ macro_rules! signals {
         /// See ["POSIX Signals"][posix_signals] for more info on some of these.
         ///
         /// [posix_signals]: https://en.wikipedia.org/wiki/Signal_(IPC)#POSIX_signals
+        /// [pull request]: https://github.com/nvzqz/asygnal/pulls
+        /// [submit an issue]: https://github.com/nvzqz/asygnal/issues
+        ///
+        // DEP: Update this when updating `Cargo.toml`
+        /// [`libc` (0.2.66)]: https://docs.rs/libc/0.2.66/libc/
+        ///
+        /// [`asygnal`]: https://github.com/nvzqz/asygnal
+        /// [`Signal::Abort`]: #variant.Abort
+        /// [`SignalSet::abort`]: struct.SignalSet.html#method.abort
+        /// [`SignalSet`]: struct.SignalSet.html
         #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
         #[non_exhaustive]
         pub enum Signal {
@@ -75,6 +103,11 @@ macro_rules! signals {
             }
         }
 
+        /// # Convenience Methods
+        ///
+        /// Builder pattern insertion of [`Signal` variants][variants].
+        ///
+        /// [variants]: enum.Signal.html#variants
         impl SignalSet {
             $(
                 $(#[doc = $doc])+
