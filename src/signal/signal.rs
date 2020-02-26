@@ -1164,6 +1164,7 @@ impl Signal {
         SignalSet::all()
     }
 
+    // TODO: Make `const`; see https://github.com/rust-lang/rust/issues/53605.
     #[inline]
     pub(crate) unsafe fn from_u8_unchecked(signal: u8) -> Self {
         mem::transmute(signal)
