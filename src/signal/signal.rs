@@ -11,21 +11,23 @@ macro_rules! signals {
     )+) => {
         /// POSIX-style signals.
         ///
-        /// # `SignalSet` Methods
-        ///
-        /// Each variant has an associated [`SignalSet`] builder-pattern method,
-        /// such as [`SignalSet::abort`] for [`Signal::Abort`]. See
-        /// ["Convenience Methods"](struct.SignalSet.html#convenience-methods).
-        ///
-        /// # Target Configuration
+        /// # Platform Support
         ///
         /// We've already done the work of scouring [`libc` (0.2.66)] to match
         /// the compilation targets for these signals. The `#[cfg(...)]` for
         /// each is declared in `signals!` and can be found by clicking `[src]`
         /// next to e.g. [`SignalSet::abort`].
         ///
+        /// - `target_env`: `uclibc`
+        ///
+        /// - `target_os`: `android`, `dragonfly`, `emscripten`, `freebsd`,
+        ///   `fuchsia`, `haiku`, `hermit`, `illumos`, `ios`, `linux`, `macos`,
+        ///   `netbsd`, `openbsd`, `redox`, `solaris`, `vxworks`
+        ///
+        /// - `target_family`: `windows`
+        ///
         /// Please [submit an issue] (or better, a [pull request]!) for any
-        /// missing signals or configurations in [`asygnal`].
+        /// signals or configurations missing in [`asygnal`].
         ///
         /// # Raw Signal Value
         ///
@@ -36,17 +38,17 @@ macro_rules! signals {
         ///
         /// See ["POSIX Signals"][posix_signals] for more info on some of these.
         ///
-        /// [posix_signals]: https://en.wikipedia.org/wiki/Signal_(IPC)#POSIX_signals
-        /// [pull request]: https://github.com/nvzqz/asygnal/pulls
+        /// [`asygnal`]:       https://github.com/nvzqz/asygnal
+        /// [pull request]:    https://github.com/nvzqz/asygnal/pulls
         /// [submit an issue]: https://github.com/nvzqz/asygnal/issues
         ///
         // DEP: Update this when updating `Cargo.toml`
         /// [`libc` (0.2.66)]: https://docs.rs/libc/0.2.66/libc/
+        /// [posix_signals]: https://en.wikipedia.org/wiki/Signal_(IPC)#POSIX_signals
         ///
-        /// [`asygnal`]: https://github.com/nvzqz/asygnal
-        /// [`Signal::Abort`]: #variant.Abort
+        /// [`Signal::Abort`]:    #variant.Abort
         /// [`SignalSet::abort`]: struct.SignalSet.html#method.abort
-        /// [`SignalSet`]: struct.SignalSet.html
+        /// [`SignalSet`]:        struct.SignalSet.html
         #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
         #[non_exhaustive]
         pub enum Signal {
@@ -158,7 +160,7 @@ signals! {
         target_os = "solaris",
         target_os = "illumos",
         // Uncategorized
-        windows,
+        target_family = "windows",
         target_os = "fuchsia",
         target_os = "redox",
         target_os = "haiku",
@@ -338,7 +340,7 @@ signals! {
         target_os = "solaris",
         target_os = "illumos",
         // Uncategorized
-        windows,
+        target_family = "windows",
         target_os = "fuchsia",
         target_os = "redox",
         target_os = "haiku",
@@ -402,7 +404,7 @@ signals! {
         target_os = "solaris",
         target_os = "illumos",
         // Uncategorized
-        windows,
+        target_family = "windows",
         target_os = "fuchsia",
         target_os = "redox",
         target_os = "haiku",
@@ -454,7 +456,7 @@ signals! {
         target_os = "solaris",
         target_os = "illumos",
         // Uncategorized
-        windows,
+        target_family = "windows",
         target_os = "fuchsia",
         target_os = "redox",
         target_os = "haiku",
@@ -650,7 +652,7 @@ signals! {
         target_os = "solaris",
         target_os = "illumos",
         // Uncategorized
-        windows,
+        target_family = "windows",
         target_os = "fuchsia",
         target_os = "redox",
         target_os = "haiku",
@@ -756,7 +758,7 @@ signals! {
         target_os = "solaris",
         target_os = "illumos",
         // Uncategorized
-        windows,
+        target_family = "windows",
         target_os = "fuchsia",
         target_os = "redox",
         target_os = "haiku",
