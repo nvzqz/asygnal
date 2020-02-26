@@ -4,6 +4,7 @@ use crate::{
 };
 use std::sync::atomic::{AtomicI32, Ordering};
 
+#[repr(align(32))] // Potentially improve cache performance.
 pub(crate) struct Table {
     pub registered: AtomicSignalSet,
     pub caught: AtomicSignalSet,
