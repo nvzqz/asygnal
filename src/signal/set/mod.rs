@@ -198,6 +198,19 @@ impl SignalSet {
         set
     }
 
+    /// Converts `self` into a raw signal set.
+    pub fn into_raw(self) -> libc::sigset_t {
+        let mut set = unsafe {
+            let mut set = mem::MaybeUninit::<libc::sigset_t>::uninit();
+            libc::sigemptyset(set.as_mut_ptr());
+            set.assume_init()
+        };
+        for signal in self {
+            unsafe { libc::sigaddset(&mut set, signal.into_raw()) };
+        }
+        set
+    }
+
     /// Registers a signal handler that will only be fulfilled once.
     ///
     /// After the `SignalSetOnce` is fulfilled, all subsequent polls will return
