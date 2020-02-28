@@ -62,20 +62,24 @@ macro_rules! signals {
             )+
         }
 
-        const SIGNAL_NUM: usize = {
-            // Create a duplicate enum except with an explicit final value
-            // that is not conditionally compiled. This ensures we can get
-            // a max value regardless of target platform.
-            #[allow(warnings)]
-            enum Signal {
-                $(
-                    $(#[cfg($cfg)])?
-                    $variant,
-                )+
-                Max,
-            }
-            Signal::Max as usize
-        };
+        impl Signal {
+            // Created here for to make use of the macro while `NUM` is declared
+            // outside, within the same `impl` block as other items.
+            const _NUM: usize = {
+                // Create a duplicate enum except with an explicit final value
+                // that is not conditionally compiled. This ensures we can get
+                // a max value regardless of target platform.
+                #[allow(warnings)]
+                enum Signal {
+                    $(
+                        $(#[cfg($cfg)])?
+                        $variant,
+                    )+
+                    Max,
+                }
+                Signal::Max as usize
+            };
+        }
 
         /// Handling of raw signal values from `libc`.
         impl Signal {
@@ -1156,7 +1160,7 @@ impl Signal {
     ///
     /// This value is exempted from [semantic versioning](https://semver.org)
     /// because it may change in the future as more signals are added.
-    pub const NUM: usize = SIGNAL_NUM;
+    pub const NUM: usize = Self::_NUM;
 
     /// Returns the set of all supported signals.
     #[inline]
