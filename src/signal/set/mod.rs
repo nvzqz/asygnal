@@ -276,6 +276,13 @@ impl SignalSet {
         self.setting(signal, true)
     }
 
+    /// Returns `self` with all of `signals` added to it.
+    #[inline]
+    #[must_use]
+    pub const fn with_all(self, signals: SignalSet) -> Self {
+        Self(self.0 | signals.0)
+    }
+
     /// Inserts `signal` into `self`.
     #[inline]
     pub fn insert<S: Into<SignalSet>>(&mut self, signals: S) {
