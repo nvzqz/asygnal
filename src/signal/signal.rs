@@ -1,4 +1,4 @@
-use super::SignalSet;
+use super::{SignalArray, SignalSet};
 use std::mem;
 
 use libc::c_int;
@@ -95,17 +95,16 @@ macro_rules! signals {
             }
 
             /// Returns the raw signal value.
+            #[inline]
             pub const fn into_raw(self) -> c_int {
-                #[cfg(docsrs)]
-                { -1 }
-
-                #[cfg(not(docsrs))]
-                match self {
+                const VALUES: SignalArray<c_int> = [
                     $(
                         $(#[cfg($cfg)])?
-                        Self::$variant => libc::$libc,
+                        libc::$libc,
                     )+
-                }
+                ];
+
+                VALUES[self as usize]
             }
         }
 
