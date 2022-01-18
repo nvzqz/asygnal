@@ -221,30 +221,9 @@ impl SignalSet {
 
     cfg_docs! {
         /// Converts `self` into a raw signal set.
-        ///
-        /// Some platforms should have `sigset_t` but don't have it declared in
-        /// `libc` and thus this method isn't available for those. See
-        /// [this libc issue](https://github.com/rust-lang/libc/issues/1671) for
-        /// tracking this on NetBSD, FreeBSD, and DragonFly BSD.
         #[cfg(any(
-            // According to `libc`:
-            // "apple"
-            target_os = "macos",
-            target_os = "ios",
-            // Only 1 in "netbsdlike"
-            target_os = "openbsd",
-            // "linux-like"
-            target_os = "linux",
-            target_os = "android",
-            target_os = "emscripten",
-            // "solarish"
-            target_os = "solaris",
-            target_os = "illumos",
-            // Uncategorized
+            unix,
             target_os = "fuchsia",
-            target_os = "redox",
-            target_os = "haiku",
-            target_os = "hermit",
             target_os = "vxworks",
         ))]
         pub fn into_raw(self) -> libc::sigset_t {
