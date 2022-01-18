@@ -84,7 +84,7 @@ macro_rules! signals {
         /// Handling of raw signal values from `libc`.
         impl Signal {
             /// Attempts to create an instance if `signal` is known.
-            pub fn from_raw(signal: c_int) -> Option<Self> {
+            pub const fn from_raw(signal: c_int) -> Option<Self> {
                 match signal {
                     $(
                         $(#[cfg($cfg)])?
@@ -95,7 +95,7 @@ macro_rules! signals {
             }
 
             /// Returns the raw signal value.
-            pub fn into_raw(self) -> c_int {
+            pub const fn into_raw(self) -> c_int {
                 #[cfg(docsrs)]
                 { -1 }
 
