@@ -220,22 +220,31 @@ impl SignalSet {
     }
 
     cfg_docs! {
-        /// Converts `self` into a raw signal set.
+        /// Converts `self` into a raw signal set, returning [`None`] on error.
         #[cfg(any(
             unix,
             target_os = "fuchsia",
             target_os = "vxworks",
         ))]
-        pub fn into_raw(self) -> libc::sigset_t {
+        pub fn into_raw(self) -> Option<libc::sigset_t> {
             let mut set = unsafe {
                 let mut set = mem::MaybeUninit::<libc::sigset_t>::uninit();
-                libc::sigemptyset(set.as_mut_ptr());
+
+                if libc::sigemptyset(set.as_mut_ptr()) < 0 {
+                    return None;
+                }
+
                 set.assume_init()
             };
+
             for signal in self {
-                unsafe { libc::sigaddset(&mut set, signal.into_raw()) };
+                let err = unsafe { libc::sigaddset(&mut set, signal.into_raw()) };
+                if err < 0 {
+                    return None;
+                }
             }
-            set
+
+            Some(set)
         }
     }
 
