@@ -304,7 +304,7 @@ impl SignalSet {
 
     /// Returns the least significant signal bit of `self`.
     #[inline]
-    pub fn first(self) -> Option<Signal> {
+    pub const fn first(self) -> Option<Signal> {
         if self.is_empty() {
             None
         } else {
@@ -315,7 +315,7 @@ impl SignalSet {
     /// Returns the least significant signal bit of `self`, assuming `self` is
     /// not empty.
     #[inline]
-    pub unsafe fn first_unchecked(self) -> Signal {
+    pub const unsafe fn first_unchecked(self) -> Signal {
         Signal::from_u8_unchecked(self.0.trailing_zeros() as u8)
     }
 
@@ -345,7 +345,7 @@ impl SignalSet {
 
     /// Returns the most significant signal bit of `self`.
     #[inline]
-    pub fn last(self) -> Option<Signal> {
+    pub const fn last(self) -> Option<Signal> {
         if self.is_empty() {
             None
         } else {
@@ -356,7 +356,7 @@ impl SignalSet {
     /// Returns the most significant signal bit of `self`, assuming `self` is
     /// not empty.
     #[inline]
-    pub unsafe fn last_unchecked(self) -> Signal {
+    pub const unsafe fn last_unchecked(self) -> Signal {
         let bits = mem::size_of::<Self>() * 8 - 1;
         let signal = bits - self.0.leading_zeros() as usize;
         Signal::from_u8_unchecked(signal as u8)

@@ -1168,9 +1168,8 @@ impl Signal {
         SignalSet::all()
     }
 
-    // TODO(#2): Make `const`
     #[inline]
-    pub(crate) unsafe fn from_u8_unchecked(signal: u8) -> Self {
+    pub(crate) const unsafe fn from_u8_unchecked(signal: u8) -> Self {
         mem::transmute(signal)
     }
 
@@ -1201,9 +1200,8 @@ macro_rules! from_int {
             $(
                 $(#[$meta])+
                 #[inline]
-                // TODO(#3): Make `const`
-                pub fn $method(signal: $int) -> Option<Self> {
-                    // Fine since `MAX_VALUE` is less than `i8::MAX_VALUE`.
+                pub const fn $method(signal: $int) -> Option<Self> {
+                    // Fine since `NUM` is less than `i8::MAX`.
                     if signal < Self::NUM as $int {
                         Some(unsafe { Self::from_u8_unchecked(signal as u8) })
                     } else {
