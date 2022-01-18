@@ -1,4 +1,4 @@
-use std::{fmt, iter::FromIterator, mem};
+use std::{fmt, mem};
 
 use super::Signal;
 
