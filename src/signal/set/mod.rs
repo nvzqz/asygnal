@@ -57,6 +57,17 @@ impl FromIterator<Signal> for SignalSet {
     }
 }
 
+impl FromIterator<SignalSet> for SignalSet {
+    #[inline]
+    fn from_iter<I>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = SignalSet>,
+    {
+        iter.into_iter()
+            .fold(Self::new(), |builder, signal| builder.with_all(signal))
+    }
+}
+
 impl Extend<Signal> for SignalSet {
     #[inline]
     fn extend<I>(&mut self, iter: I)
@@ -64,6 +75,16 @@ impl Extend<Signal> for SignalSet {
         I: IntoIterator<Item = Signal>,
     {
         iter.into_iter().for_each(|signal| self.insert(signal));
+    }
+}
+
+impl Extend<SignalSet> for SignalSet {
+    #[inline]
+    fn extend<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = SignalSet>,
+    {
+        iter.into_iter().for_each(|signals| self.insert(signals));
     }
 }
 
